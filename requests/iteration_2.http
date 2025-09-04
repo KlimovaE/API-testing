@@ -1,0 +1,327 @@
+
+### User1Token: Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+### User2Token: Authorization: Basic a2F0ZTIwMjQ6S2F0ZTIwMjQh
+### AdminToken: Authorization: Basic YWRtaW46YWRtaW4=
+
+
+###Positive test: Update user's name from null
+### user1 name null->kate
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "name": "kate"
+}
+
+###Positive test: Update user's name to another valid name
+### user1 name kate->kat
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "name": "kat"
+}
+
+###Positive test: Update user's name to duplicate name
+### user1 name kat->kat
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "name": "kat"
+}
+
+###Positive test: Update user's name to duplicate another user's name
+### user2 name null->kat
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjQ6S2F0ZTIwMjQh
+
+{
+  "name": "kat"
+}
+
+###Positive test: Update user's name - use all type symbols
+### use1 name kat->Kate 1234567890:%;№"!?*()+=,/\'<>.-_
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "name": "Kate 1234567890:%;№!?*()+=,/\"'<>.-_"
+}
+
+###Corner test: Update user's name - all symbols are special symbols
+### user1 name Kate 1234567890:%;№!?*()+=,/\"'<>.-_ -> -:%;№!?*()+=,/\"'<>.-_
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "name": "-:%;№!?*()+=,/\"'<>.-_"
+}
+
+###Corner test: Update user's name - all symbols are numbers
+### user1 name -:%;№!?*()+=,/\"'<>.-_ -> 1234567890
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "name": "1234567890"
+}
+
+###Negative test: Update user's name to empty
+### user1 name 1234567890->""
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "name": ""
+}
+
+
+###Negative test: Update user's name to only spases
+### user1 name 1234567890-"    "
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "name": "    "
+}
+
+###Тестирование депозита
+###Positive test: make first deposit to empty account
+### 0 + 100 = 100
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 1,
+  "balance": 100
+}
+
+###Positive test: make a deposit to not empty account
+### 100 + 200 = 300
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 1,
+  "balance": 200
+}
+
+###Positive test: make a deposit with non-integer number
+### 300 + 0.01 = 300.01
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 1,
+  "balance": 0.01
+}
+
+###Corner test: make a deposit with 0
+### 300.01 + 0
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 1,
+  "balance": 0
+}
+
+###Negative test: make a deposit to not exist account
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 100500,
+  "balance": 100
+}
+
+###Negative test: make a deposit to account another user
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 3,
+  "balance": 100
+}
+
+###Negative test: make a negative deposit
+### 300.01 -100
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 1,
+  "balance": -100
+}
+
+###Negative test: make a negative deposit to empty account
+### 0 - 100
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 2,
+  "balance": -100
+}
+
+###Тестирование транзакций
+###Positive test: make transfer to empty account
+### balance before 300.01/0 -> amount 100 -> balance after 200.01/100
+POST http://localhost:4111//api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 100
+}
+
+###Тестирование транзакций
+###Positive test: make a transfer to not empty account
+### balance before 200.01/100 -> amount 70 -> balance after 130.01/170
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 70
+}
+
+###Positive test: make a transfer with min amount
+### balance before 130.01/170 -> amount 0.01 -> balance after 130/170.01
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 0.01
+}
+
+###Positive test: make a transfer to another user
+### balance before 130/0 -> amount 100.01 -> balance after 29.9/100.01
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 3,
+  "amount": 100.01
+}
+
+###Positive test: make a transfer all balance
+### balance before 29.9
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 29.9
+}
+
+###Negative test: make a transfer with zero
+### balance before 29.9/100.01 -> amount 0
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 3,
+  "amount": 0
+}
+
+###Negative test: make a transfer to not exist account
+### balance before 29.9
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 100500,
+  "amount": 20
+}
+
+###Negative test: make a transfer from not exist account
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 100500,
+  "receiverAccountId": 1,
+  "amount": 20
+}
+
+###Negative test: make a transfer from ccount another user
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 3,
+  "receiverAccountId": 1,
+  "amount": 20
+}
+
+###Negative test: make a transfer more than balance
+### balance before 200
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 2,
+  "receiverAccountId": 1,
+  "amount": 200.01
+}
+
+###Negative test: make a negative transfer
+### balance before 200
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 2,
+  "receiverAccountId": 3,
+  "amount": -10
+}
+
+###Negative test: make a transfer from-to one account
+### balance before 200
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 2,
+  "receiverAccountId": 2,
+  "amount": 100
+}
