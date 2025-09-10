@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import requests.UpdateCustomerProfile;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -192,7 +193,7 @@ public class UpdateUserName {
     @Test
     @DisplayName("Пользователь может изменить себе имя на имя у другого пользователя")
     public void userCanUpdateNameToNameAnotherUserTest() {
-    String duplicateName = "UserKate";
+        String duplicateName = "UserKate";
         // Задаем имя первому пользователю
         given()
                 .contentType(ContentType.JSON)
@@ -230,12 +231,13 @@ public class UpdateUserName {
     @MethodSource("nameDataForCornerCases")
     @DisplayName("Пользователь может изменить имя на значение только из символов или чисел")
     public void useOnlySpecialSymbolsOrNumbersForNameTest(String newName) {
+        UpdateCustomerProfile updateCustomerProfile = UpdateCustomerProfile.
         given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .header("Authorization", user1Token)
-        //Вручную: JSON валиден, кавычки правильно экранированы
-        //В тесте: String.format() может некорректно обработать \" и ' в строке
+                //Вручную: JSON валиден, кавычки правильно экранированы
+                //В тесте: String.format() может некорректно обработать \" и ' в строке
                 .body(String.format("""
                         {
                         "name":"%s"
