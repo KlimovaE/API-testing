@@ -1,0 +1,28 @@
+{
+  "id": 1,
+  "accountNumber": "ACC1",
+  "balance": 300.01,
+  "transactions": [
+    {
+      "id": 1,
+      "amount": 100.0,
+      "type": "DEPOSIT",
+      "timestamp": "Tue Sep 02 23:27:29 UTC 2025",
+      "relatedAccountId": 1
+    },
+    {
+      "id": 3,
+      "amount": 0.01,
+      "type": "DEPOSIT",
+      "timestamp": "Tue Sep 02 23:28:17 UTC 2025",
+      "relatedAccountId": 1
+    },
+    {
+      "id": 2,
+      "amount": 200.0,
+      "type": "DEPOSIT",
+      "timestamp": "Tue Sep 02 23:27:52 UTC 2025",
+      "relatedAccountId": 1
+    }
+  ]
+}

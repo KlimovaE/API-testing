@@ -1,0 +1,84 @@
+{
+  "id": 1,
+  "accountNumber": "ACC1",
+  "balance": 200.10999999999999,
+  "transactions": [
+    {
+      "id": 17,
+      "amount": 200.0,
+      "type": "DEPOSIT",
+      "timestamp": "Fri Sep 05 16:43:00 UTC 2025",
+      "relatedAccountId": 1
+    },
+    {
+      "id": 8,
+      "amount": 0.01,
+      "type": "TRANSFER_OUT",
+      "timestamp": "Tue Sep 02 23:37:18 UTC 2025",
+      "relatedAccountId": 2
+    },
+    {
+      "id": 16,
+      "amount": 0.01,
+      "type": "DEPOSIT",
+      "timestamp": "Fri Sep 05 16:30:13 UTC 2025",
+      "relatedAccountId": 1
+    },
+    {
+      "id": 1,
+      "amount": 100.0,
+      "type": "DEPOSIT",
+      "timestamp": "Tue Sep 02 23:27:29 UTC 2025",
+      "relatedAccountId": 1
+    },
+    {
+      "id": 10,
+      "amount": 100.01,
+      "type": "TRANSFER_OUT",
+      "timestamp": "Tue Sep 02 23:38:30 UTC 2025",
+      "relatedAccountId": 3
+    },
+    {
+      "id": 12,
+      "amount": 29.9,
+      "type": "TRANSFER_OUT",
+      "timestamp": "Tue Sep 02 23:43:28 UTC 2025",
+      "relatedAccountId": 2
+    },
+    {
+      "id": 6,
+      "amount": 70.0,
+      "type": "TRANSFER_OUT",
+      "timestamp": "Tue Sep 02 23:36:51 UTC 2025",
+      "relatedAccountId": 2
+    },
+    {
+      "id": 18,
+      "amount": 0.01,
+      "type": "DEPOSIT",
+      "timestamp": "Sat Sep 06 13:20:55 UTC 2025",
+      "relatedAccountId": 1
+    },
+    {
+      "id": 3,
+      "amount": 0.01,
+      "type": "DEPOSIT",
+      "timestamp": "Tue Sep 02 23:28:17 UTC 2025",
+      "relatedAccountId": 1
+    },
+    {
+      "id": 4,
+      "amount": 100.0,
+      "type": "TRANSFER_OUT",
+      "timestamp": "Tue Sep 02 23:35:33 UTC 2025",
+      "relatedAccountId": 2
+    },
+    {
+      "id": 2,
+      "amount": 200.0,
+      "type": "DEPOSIT",
+      "timestamp": "Tue Sep 02 23:27:52 UTC 2025",
+      "relatedAccountId": 1
+    }
+  ]
+}

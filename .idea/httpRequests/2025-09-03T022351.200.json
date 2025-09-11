@@ -1,0 +1,24 @@
+{
+  "customer": {
+    "id": 1,
+    "username": "kate2025",
+    "password": "$2a$10$KmhmIiVSzLu6xhDooy4u9OhhgHhrJBhOWuARG6nt/pbHZHTS3Utwe",
+    "name": "    ",
+    "role": "USER",
+    "accounts": [
+      {
+        "id": 1,
+        "accountNumber": "ACC1",
+        "balance": 0.0,
+        "transactions": []
+      },
+      {
+        "id": 2,
+        "accountNumber": "ACC2",
+        "balance": 0.0,
+        "transactions": []
+      }
+    ]
+  },
+  "message": "Profile updated successfully"
+}
