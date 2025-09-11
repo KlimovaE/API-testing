@@ -1,20 +1,22 @@
 package iteration_2;
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+import models.CreateUserRequest;
+import models.LoginUserRequest;
+import models.UpdateCustomerProfileRequest;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import requests.AdminLoginUserRequest;
+import requests.CreateUser;
 import requests.UpdateCustomerProfile;
+import spec.RequestSpecs;
+import spec.ResponseSpecs;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
@@ -22,100 +24,55 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 public class UpdateUserName {
-    String adminToken;
+    String adminToken = "Basic YWRtaW46YWRtaW4=";
     String user1Token;
     String user2Token;
+    String user1Password = "Kate012!";
+    String user2Password = "Kate013!";
     //Генерация уникальных userName для каждого теста
     String user1Username = "A_" + System.currentTimeMillis(); // "kate001_123456"
     String user2Username = "B_" + System.currentTimeMillis(); // "kate002_123456"
+    String userRole = "USER";
 
-    @BeforeAll
-    public static void setupRestAssured() {
-        RestAssured.filters(
-                List.of(new RequestLoggingFilter(),
-                        new ResponseLoggingFilter()));
 
-    }
     @BeforeEach
     public void setupTestData() {
-        //Получение токена для админа
-        adminToken = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body("""
-                        {
-                          "username": "admin",
-                          "password": "admin"
-                        }
-                        """)
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .header("Authorization");
-        //Создание первого пользователя
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", adminToken)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate012!",
-                          "role": "USER"
-                        }
-                        """, user1Username))
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED);
+        //создание первого пользователя(middle)
+        CreateUserRequest userRequest = CreateUserRequest.builder().
+                username(user1Username)
+                .password(user1Password)
+                .role(userRole)
+                .build();
+        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())
+                .post(userRequest);
+
         //Создание второго пользователя
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", adminToken)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate013!",
-                          "role": "USER"
-                        }
-                        """, user2Username))
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_CREATED);
+        CreateUserRequest userRequest2 = CreateUserRequest.builder()
+                .username(user2Username)
+                .password(user2Password)
+                .role(userRole)
+                .build();
+        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())
+                .post(userRequest2);
+
         //Получение токена для пользователя1
-        user1Token = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate012!"
-                        }
-                        """, user1Username))
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
+        LoginUserRequest loginUser1Request = LoginUserRequest.builder()
+                .username(user1Username)
+                .password(user1Password)
+                .build();
+        user1Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+                .post(loginUser1Request)
                 .extract()
                 .header("Authorization");
+
         //Получение токена для пользователя2
-        user2Token = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate013!"
-                        }
-                        """, user2Username))
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
+        LoginUserRequest loginUser2Request = LoginUserRequest.builder()
+                .username(user2Username)
+                .password(user2Password)
+                .build();
+
+        user2Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+                .post(loginUser2Request)
                 .extract()
                 .header("Authorization");
     }
@@ -157,81 +114,72 @@ public class UpdateUserName {
     public void userCanUpdateNameTest(String initialName, String newName) {
         // Если initialName не null, сначала устанавливаем его
         if (initialName != null) {
+            //передаем в json initialName
+            UpdateCustomerProfileRequest updateUser1 = UpdateCustomerProfileRequest.builder()
+                    .name(initialName)
+                    .build();
+            new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), initialName)
+                    .put(updateUser1);
+
             given()
-                    .contentType(ContentType.JSON)
-                    .accept(ContentType.JSON)
-                    .header("Authorization", user1Token)
-                    .body(String.format("""
-                        {
-                          "name": "%s"
-                        }
-                        """, initialName))
-                    .put("http://localhost:4111/api/v1/customer/profile")
+                    .spec(RequestSpecs.userAuthSpec(user1Token))
+                    .body(updateUser1)
+                    .put("/api/v1/customer/profile")
                     .then()
                     .assertThat()
-                    .statusCode(HttpStatus.SC_OK)
-                    .body("customer.name", equalTo(initialName));
+                    .spec(ResponseSpecs.requestReturnOkAndCheckNewName(initialName));
 
         }
 
         // Теперь меняем имя на новое
+        UpdateCustomerProfileRequest updateUser1 = UpdateCustomerProfileRequest.builder()
+                .name(newName)
+                .build();
+        new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), newName)
+        .put(updateUser1);
+
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(String.format("""
-                        {
-                          "name": "%s"
-                        }
-                        """, newName))
-                .put("http://localhost:4111/api/v1/customer/profile")
+                .spec(RequestSpecs.userAuthSpec(user1Token))
+                .body(updateUser1)
+                .put("/api/v1/customer/profile")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .body("customer.name", equalTo(newName));
+                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(newName));
     }
+
     @Test
     @DisplayName("Пользователь может изменить себе имя на имя у другого пользователя")
     public void userCanUpdateNameToNameAnotherUserTest() {
         String duplicateName = "UserKate";
         // Задаем имя первому пользователю
+        UpdateCustomerProfileRequest user1update = UpdateCustomerProfileRequest.builder()
+                .name(duplicateName)
+                .build();
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(String.format("""
-                        {
-                          "name": "%s"
-                        }
-                        """, duplicateName))
-                .put("http://localhost:4111/api/v1/customer/profile")
+                .spec(RequestSpecs.userAuthSpec(user1Token))
+                .body(user1update)
+                .put("/api/v1/customer/profile")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .body("customer.name", equalTo(duplicateName));
+                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(duplicateName));
 
         // Задаем имя первого пользователя второму
+        UpdateCustomerProfileRequest user2update = UpdateCustomerProfileRequest.builder()
+                .name(duplicateName)
+                .build();
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", user2Token)
-                .body(String.format("""
-                        {
-                          "name": "%s"
-                        }
-                        """, duplicateName))
-                .put("http://localhost:4111/api/v1/customer/profile")
+                .spec(RequestSpecs.userAuthSpec(user2Token))
+                .body(user1update)
+                .put("/api/v1/customer/profile")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .body("customer.name", equalTo(duplicateName));
+                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(duplicateName));
     }
 
     @ParameterizedTest
     @MethodSource("nameDataForCornerCases")
     @DisplayName("Пользователь может изменить имя на значение только из символов или чисел")
     public void useOnlySpecialSymbolsOrNumbersForNameTest(String newName) {
-        UpdateCustomerProfile updateCustomerProfile = UpdateCustomerProfile.
         given()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
@@ -250,23 +198,21 @@ public class UpdateUserName {
                 .body("customer.name", equalTo(newName));
 
     }
+
     @ParameterizedTest
     @MethodSource("nameDataForNegativeCases")
     @DisplayName("Пользователь не может изменить имя на невалидное значение(пустое, только пробелы)")
     public void userCannotUpdateNameWithInvalidValue(String newName) {
+        UpdateCustomerProfileRequest user1update = UpdateCustomerProfileRequest.builder()
+                .name(newName)
+                .build();
         given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(String.format("""
-                        {
-                        "name":"%s"
-                        }
-                        """, newName))
-                .put("http://localhost:4111/api/v1/customer/profile")
+                .spec(RequestSpecs.userAuthSpec(user1Token))
+                .body(user1update)
+                .put("/api/v1/customer/profile")
                 .then()
                 .assertThat()
-                .statusCode(HttpStatus.SC_BAD_REQUEST);
+                .spec(ResponseSpecs.requestReturnsBadRequest());
     }
 
 }

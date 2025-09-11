@@ -1,18 +1,19 @@
 package iteration_2;
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+import models.CreateUserRequest;
+import models.LoginUserRequest;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import requests.AdminLoginUserRequest;
+import requests.CreateUser;
+import spec.RequestSpecs;
+import spec.ResponseSpecs;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -27,6 +28,9 @@ public class DepositAccount {
     //Генерация уникальных userName для каждого теста
     String user1Username = "A_" + System.currentTimeMillis(); // "kate001_123456"
     String user2Username = "B_" + System.currentTimeMillis(); // "kate002_123456"
+    String user1Password = "Kate012!";
+    String user2Password = "Kate013!";
+    String userRole = "USER";
     static int firstAccountUser1;
     static int secondAccountUser1;
     static Random random = new Random();
@@ -42,63 +46,28 @@ public class DepositAccount {
                 .extract()
                 .path("id");
     }
-
-    @BeforeAll
-    public static void setupRestAssured() {
-        RestAssured.filters(
-                List.of(new RequestLoggingFilter(),
-                        new ResponseLoggingFilter()));
-
-    }
-
     @BeforeEach
     public void setupTestData() {
-        //Получение токена для админа
-        adminToken = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body("""
-                        {
-                          "username": "admin",
-                          "password": "admin"
-                        }
-                        """)
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .header("Authorization");
         //Создание первого пользователя
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", adminToken)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate012!",
-                          "role": "USER"
-                        }
-                        """, user1Username))
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .statusCode(HttpStatus.SC_CREATED);
+        CreateUserRequest createUser1Request = CreateUserRequest.builder()
+                .username(user1Username)
+                .password(user1Password)
+                .role(userRole)
+                .build();
+        new CreateUser(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.entityWasCreated())
+                .post(createUser1Request);
         //Получение токена для пользователя1
-        user1Token = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate012!"
-                        }
-                        """, user1Username))
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
+        LoginUserRequest loginUser1 = LoginUserRequest.builder()
+                .username(user1Username)
+                .password(user1Password)
+                .build();
+
+        user1Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+                .post(loginUser1)
                 .extract()
                 .header("Authorization");
-        //Create first account for user1
+
+        //Создание счета первого пользователя
         firstAccountUser1 = createAccount();
     }
 

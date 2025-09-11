@@ -5,15 +5,14 @@ import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import models.BaseModel;
 
-public abstract class Request <T extends BaseModel>{
+public abstract class PutRequest<T extends BaseModel> {
     protected RequestSpecification requestSpecification;// как отправлять
     protected ResponseSpecification responseSpecification;// что ожидать в ответ
 
-    public Request(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+    public PutRequest(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
         this.requestSpecification = requestSpecification;
         this.responseSpecification = responseSpecification;
     }
 
-    public abstract ValidatableResponse post(T model);
-
+    public abstract ValidatableResponse put(T model);
 }

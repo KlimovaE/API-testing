@@ -4,6 +4,8 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.ResponseSpecification;
 import org.apache.http.HttpStatus;
 
+import static org.hamcrest.Matchers.equalTo;
+
 public class ResponseSpecs {
     private ResponseSpecs() {
     }
@@ -17,9 +19,23 @@ public class ResponseSpecs {
                 .expectStatusCode(HttpStatus.SC_CREATED)
                 .build();
     }
+
     public static ResponseSpecification requestReturnsOK() {
         return defaultResponseBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
+                .build();
+    }
+
+    public static ResponseSpecification requestReturnOkAndCheckNewName(String newName) {
+        return defaultResponseBuilder()
+                .expectStatusCode(HttpStatus.SC_OK)
+                .expectBody("customer.name", equalTo(newName))
+                .build();
+    }
+
+    public static ResponseSpecification requestReturnsBadRequest() {
+        return ResponseSpecs.defaultResponseBuilder()
+                .expectStatusCode(HttpStatus.SC_BAD_REQUEST)
                 .build();
     }
 }

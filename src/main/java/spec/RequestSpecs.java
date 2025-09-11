@@ -31,8 +31,10 @@ public class RequestSpecs {
                 .build();
     }
 
-    public static RequestSpecBuilder userAuthSpec(String token) {
+    public static RequestSpecification userAuthSpec(String token) {
         return defaultRequestBuilder()
-                .addHeader("Authorization", token);
+                .addHeader("Authorization", token)
+                .build();
+
     }
 }
