@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TransferAccountRequest extends BaseModel<BaseModel> {
+public class TransferAccountRequest extends BaseModel {
     private long senderAccountId;
     private long receiverAccountId;
     private double amount;

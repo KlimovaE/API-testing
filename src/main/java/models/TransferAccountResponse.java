@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Data
-public class TransferAccountResponse extends BaseModel<BaseModel> {
+public class TransferAccountResponse extends BaseModel{
     private List<UserAccountsData> userAccountsData;
 }
 
