@@ -7,13 +7,13 @@ import models.DepositAccountRequest;
 
 import static io.restassured.RestAssured.given;
 
-public class UserDepositAccount extends PostRequest<DepositAccountRequest<Double>> {
+public class UserDepositAccount extends PostRequest<DepositAccountRequest> {
     public UserDepositAccount(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
         super(requestSpecification, responseSpecification);
     }
 
     @Override
-    public ValidatableResponse post(DepositAccountRequest<Double> model) {
+    public ValidatableResponse post(DepositAccountRequest model) {
     return given()
             .spec(requestSpecification)
             .body(model)

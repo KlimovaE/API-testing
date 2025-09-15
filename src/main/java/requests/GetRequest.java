@@ -5,7 +5,7 @@ import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import models.BaseModel;
 
-public abstract class GetRequest  <T extends BaseModel<BaseModel>> {
+public abstract class GetRequest  <T extends BaseModel> {
     protected RequestSpecification requestSpecification;// как отправлять
     protected ResponseSpecification responseSpecification;// что ожидать в ответ
 

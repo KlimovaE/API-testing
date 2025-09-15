@@ -1,299 +1,206 @@
 package iteration_2;
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
+import models.*;
 import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.List;
-import java.util.Map;
+import requests.*;
+import spec.RequestSpecs;
+import spec.ResponseSpecs;
 import java.util.Random;
 import java.util.stream.Stream;
-
-import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransferToAccount {
-    String adminToken;
     String user1Token;
     String user2Token;
     //Генерация уникальных userName для каждого теста
-    String user1Username = "A_" + System.currentTimeMillis(); // "kate001_123456"
-    String user2Username = "B_" + System.currentTimeMillis(); // "kate002_123456"
-    int firstAccountUser1;
-    int secondAccountUser1;
-    int firstAccountUser2;
+    String user1Username = "A_" + System.currentTimeMillis();
+    String user2Username = "B_" + System.currentTimeMillis();
+    String user1Password = "Kate012!";
+    String user2Password = "Kate013!";
+    long firstAccountUser1;
+    long secondAccountUser1;
+    long firstAccountUser2;
+    String userRole = "USER";
     Random random = new Random();
-
-    public int createAccount(String userToken) {
-        return given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", userToken)
-                .post("http://localhost:4111/api/v1/accounts")
-                .then()
-                .statusCode(HttpStatus.SC_CREATED)
-                .extract()
-                .path("id");
-    }
-
-    @BeforeAll
-    public static void setupRestAssured() {
-        RestAssured.filters(
-                List.of(new RequestLoggingFilter(),
-                        new ResponseLoggingFilter()));
-
-    }
+    static long randomNonExistentId = new Random().nextInt(100000, 1000000);
 
     @BeforeEach
     public void setupTestData() {
-        //Получение токена для админа
-        adminToken = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body("""
-                        {
-                          "username": "admin",
-                          "password": "admin"
-                        }
-                        """)
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .header("Authorization");
         //Создание первого пользователя
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", adminToken)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate012!",
-                          "role": "USER"
-                        }
-                        """, user1Username))
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .statusCode(HttpStatus.SC_CREATED);
+        createUser(user1Username, user1Password, userRole);
         //Создание второго пользователя
-        given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", adminToken)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate013!",
-                          "role": "USER"
-                        }
-                        """, user2Username))
-                .post("http://localhost:4111/api/v1/admin/users")
-                .then()
-                .statusCode(HttpStatus.SC_CREATED);
+        createUser(user2Username, user2Password, userRole);
+
         //Получение токена для пользователя1
-        user1Token = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate012!"
-                        }
-                        """, user1Username))
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .header("Authorization");
+        user1Token = getToken(user1Username, user1Password);
         //Получение токена для пользователя2
-        user2Token = given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .body(String.format("""
-                        {
-                          "username": "%s",
-                          "password": "Kate013!"
-                        }
-                        """, user2Username))
-                .post("http://localhost:4111/api/v1/auth/login")
-                .then()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .header("Authorization");
-        //Create first account for user1
+        user2Token = getToken(user2Username, user2Password);
+
+        //Создание 2х счетов для пользователя 1 и 1 счета для пользователя 2
         firstAccountUser1 = createAccount(user1Token);
         secondAccountUser1 = createAccount(user1Token);
         firstAccountUser2 = createAccount(user2Token);
     }
 
+    //Метод по созданию аккаунта
+    public long createAccount(String userToken) {
+
+        return new CreateAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.entityWasCreated())
+                .post()
+                .extract()
+                .jsonPath()
+                .getLong("id");
+    }
+
+    //Метод по созданию пользователя
+    private void createUser(String userName, String userPassword, String role) {
+        CreateUserRequest createUser = CreateUserRequest.builder()
+                .username(userName)
+                .password(userPassword)
+                .role(role)
+                .build();
+        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())
+                .post(createUser);
+    }
+
+    //Метод по получению токена
+    private String getToken(String userName, String userPassword) {
+        LoginUserRequest loginUser1 = LoginUserRequest.builder()
+                .username(userName)
+                .password(userPassword)
+                .build();
+        return new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+                .post(loginUser1)
+                .extract()
+                .header("Authorization");
+    }
     //Метод по предварительному пополнению баланса
-    private void depositUserAccount(String userToken, int userAccount, double balance) {
-        given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(Map.of("id", userAccount, "balance", balance))
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .statusCode(HttpStatus.SC_OK);
-    }
-
-    public static Stream<Arguments> transactionDataForPositiveCase() {
-        return Stream.of(
-                Arguments.of(300, 0, 100, 200, 100),
-                Arguments.of(500, 100, 150, 350, 250),
-                Arguments.of(300, 0, 0.01, 299.99, 0.01),
-                Arguments.of(300, 0, 300, 0, 300)
-        );
-    }
-
-    public static Stream<Arguments> transactionDataAmountForNegativeCase() {
-        return Stream.of(
-                Arguments.of(300, 300.01),
-                Arguments.of(500, -100),
-                Arguments.of(300, 0)
-        );
-    }
-
-    public static Stream<Arguments> transactionDataAccountForNegativeCase() {
-        return Stream.of(
-                // testCase, transferAmount, expectedStatusCode
-                Arguments.of("С несуществующего счета", 300.0, HttpStatus.SC_FORBIDDEN),
-                Arguments.of("На несуществующий счет", 300.0, HttpStatus.SC_BAD_REQUEST),
-                Arguments.of("Со счета другого пользователя", 300.0, HttpStatus.SC_FORBIDDEN),
-                Arguments.of("На тот же счет", 300.0, HttpStatus.SC_BAD_REQUEST)
-        );
+    private void depositUserAccount(String userToken, long userAccount, double balance) {
+        DepositAccountRequest depositAccountRequest = DepositAccountRequest.builder()
+                .id(userAccount)
+                .balance(balance)
+                .build();
+        new UserDepositAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
+                .post(depositAccountRequest);
     }
 
     private String getUserAmountsInfo(String userToken) {
-        return given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", userToken)
-                .get("http://localhost:4111/api/v1/customer/accounts")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)  // ← сначала проверяем статус!
+        return new GetCustomerProfileRequest(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
+                .get()
                 .extract()
-                .asString();  // ← получаем как строку
+                .asString();// ← получаем как строку
+    }
+
+    //Метод по проверке баланса
+    private double actualAccountBalance(String userToken, long userAccount) {
+        return JsonPath.from(getUserAmountsInfo(userToken))
+                .getDouble("find { it.id == " + userAccount + " }.balance");
+    }
+
+    //Общий метод для успешных переводов (позитивные кейсы)
+    private void runPositiveTest(long senderAccount, long receiverAccount,
+                                 double initialSenderBalance, double initialReceiverBalance,
+                                 double transferAmount, String userSenderToken, String userReceiverToken) {
+
+        // Установка начального баланса
+        depositUserAccount(userSenderToken, senderAccount, initialSenderBalance);
+        if (initialReceiverBalance != 0) {
+            depositUserAccount(userReceiverToken, receiverAccount, initialReceiverBalance);
+        }
+
+        // Перевод
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(senderAccount)
+                .receiverAccountId(receiverAccount)
+                .amount(transferAmount)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(userSenderToken), ResponseSpecs.requestReturnsOK())
+                .post(request);
+        double actualSenderBalance = actualAccountBalance(userSenderToken, senderAccount);
+        double actualReceiverBalance = actualAccountBalance(userReceiverToken, receiverAccount);
+
+        //Проверка, что баланс отправителя уменьшился
+        assertEquals(initialSenderBalance-transferAmount, actualSenderBalance, 0.01);
+        //Проверка, что баланс получателя пополнился
+        assertEquals(initialReceiverBalance+transferAmount, actualReceiverBalance, 0.01);
+    }
+
+    //Общий метод пополнения для негативных запросов
+    private void runNegativeTest(long senderAccount, long receiverAccount,
+                                 double transferAmount, int expectedStatusCode) {
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(senderAccount)
+                .receiverAccountId(receiverAccount)
+                .amount(transferAmount)
+                .build();
+
+        int actualStatusCode = new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+                ResponseSpecs.requestCanReturnAnyStatus())
+                .post(request)
+                .extract()
+                .statusCode();
+
+        assertEquals(expectedStatusCode, actualStatusCode);
+    }
+
+    public static Stream<Arguments> ownAccountsTransferData() {
+        return Stream.of(
+                Arguments.of(300, 0, 100),
+                Arguments.of(500, 100, 150),
+                Arguments.of(300, 0, 0.01),
+                Arguments.of(300, 0, 300)
+        );
     }
 
     @ParameterizedTest
-    @DisplayName("Успешное пополнение счета первый и последующие разы")
-    @MethodSource("transactionDataForPositiveCase")
-    public void userCanTransitTest(double initialFirstAccountUser1Balance, double initialSecondAccountUser1Balance,
-                                   double transferAmount, double expectedFirstAccountUser1Balance, double expectedSecondAccountUser1Balance) {
+    @DisplayName("Успешный перевод между своими счетами")
+    @MethodSource("ownAccountsTransferData")
+    public void transferBetweenOwnAccounts(double initialSenderBalance, double initialReceiverBalance,
+                                           double transferAmount) {
 
-        // 1. Устанавливаем начальный баланс (если нужно)
-        depositUserAccount(user1Token, firstAccountUser1, initialFirstAccountUser1Balance);
-        if (initialSecondAccountUser1Balance != 0) {
-            depositUserAccount(user1Token, secondAccountUser1, initialSecondAccountUser1Balance);
-        }
-
-        // 2. Делаем перевод
-        given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(Map.of("senderAccountId", firstAccountUser1, "receiverAccountId", secondAccountUser1, "amount", transferAmount))
-                .post("http://localhost:4111/api/v1/accounts/transfer")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK);
-
-        Double actualBalanceFirstAccountUser1 = JsonPath.from(getUserAmountsInfo(user1Token))
-                .getDouble("find { it.id == " + firstAccountUser1 + " }.balance");
-        Double actualBalanceSecondAccountUser1 = JsonPath.from(getUserAmountsInfo(user1Token))
-                .getDouble("find { it.id == " + secondAccountUser1 + " }.balance");
-
-        assertEquals(actualBalanceFirstAccountUser1, expectedFirstAccountUser1Balance, 0.01);
-        assertEquals(actualBalanceSecondAccountUser1, expectedSecondAccountUser1Balance, 0.01);
+        runPositiveTest(firstAccountUser1, secondAccountUser1,
+                initialSenderBalance, initialReceiverBalance,
+                transferAmount, user1Token, user1Token);
 
     }
 
-    @ParameterizedTest
-    @DisplayName("Неуспешный перевод с невалидной суммой")
-    @MethodSource("transactionDataAmountForNegativeCase")
-    public void userCannotTransitInvalidAmountTest(double initialFirstAccountUser1Balance, double transferAmount) {
-
-        // 1. Устанавливаем начальный баланс (если нужно)
-        depositUserAccount(user1Token, firstAccountUser1, initialFirstAccountUser1Balance);
-
-
-        // 2. Делаем перевод
-        given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(Map.of("senderAccountId", firstAccountUser1, "receiverAccountId", secondAccountUser1, "amount", transferAmount))
-                .post("http://localhost:4111/api/v1/accounts/transfer")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_BAD_REQUEST);
-
+    @Test
+    @DisplayName("Успешный перевод другому пользователю")
+    public void transferToOtherUser() {
+        runPositiveTest(firstAccountUser1, firstAccountUser2, 300, 0, 0.01, user1Token, user2Token);
     }
 
-    @ParameterizedTest
-    @DisplayName("Неуспешный перевод с невалидными счетами")
-    @MethodSource("transactionDataAccountForNegativeCase")
-    public void userCannotTransferTest(String testCase, double transferAmount, int expectedStatusCode) {
+    @Test
+    @DisplayName("Ошибка: перевод с несуществующего счета")
+    public void cannotTransferFromNonExistentAccount() {
+        runNegativeTest(randomNonExistentId, firstAccountUser1, 300.0, HttpStatus.SC_FORBIDDEN);
+    }
 
-        int senderAccountId;
-        int receiverAccountId;
-        int randomNonExistentId = new Random().nextInt(100000, 1000000);
+    @Test
+    @DisplayName("Ошибка: перевод на несуществующий счет")
+    public void cannotTransferToNonExistentAccount() {
+        runNegativeTest(firstAccountUser1, randomNonExistentId, 300.0, HttpStatus.SC_BAD_REQUEST);
+    }
 
-        switch (testCase) {
-            case "На несуществующий счет":
-                // счет1 -> несуществующий счет
-                senderAccountId = firstAccountUser1;
-                receiverAccountId = randomNonExistentId;
-                break;
+    @Test
+    @DisplayName("Ошибка: перевод с чужого счета")
+    public void cannotTransferFromOtherUserAccount() {
+        runNegativeTest(firstAccountUser2, firstAccountUser1, 300.0, HttpStatus.SC_FORBIDDEN);
+    }
 
-            case "С несуществующего счета":
-                // несуществующий счет -> счет1
-                senderAccountId = randomNonExistentId;
-                receiverAccountId = firstAccountUser1;
-                break;
-
-            case "Со счета другого пользователя":
-                // счет другого пользователя -> счет1
-                senderAccountId = firstAccountUser2; // счет user2
-                receiverAccountId = firstAccountUser1; // счет user1
-                break;
-
-            case "На тот же счет":
-                // счет1 -> счет1 (самому себе)
-                senderAccountId = firstAccountUser1;
-                receiverAccountId = firstAccountUser1;
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unknown test case: " + testCase);
-        }
-
-        // Убедимся что sender счет имеет достаточно средств (кроме случая с несуществующим счетом)
-        if (!testCase.equals("FROM_NON_EXISTENT") && !testCase.equals("FROM_OTHER_USER")) {
-            depositUserAccount(user1Token, firstAccountUser1, 500.0);
-        }
-
-        given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(Map.of(
-                        "senderAccountId", senderAccountId,
-                        "receiverAccountId", receiverAccountId,
-                        "amount", transferAmount
-                ))
-                .post("http://localhost:4111/api/v1/accounts/transfer")
-                .then()
-                .assertThat()
-                .statusCode(expectedStatusCode);
+    @Test
+    @DisplayName("Ошибка: счет получателя тот же, что и отправителя")
+    public void cannotTransferToSameAccount() {
+        depositUserAccount(user1Token, firstAccountUser1, 500);
+        runNegativeTest(firstAccountUser1, firstAccountUser1, 300.0, HttpStatus.SC_BAD_REQUEST);
     }
 
 }

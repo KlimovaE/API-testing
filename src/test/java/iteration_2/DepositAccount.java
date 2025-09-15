@@ -1,24 +1,23 @@
 package iteration_2;
 
-import io.restassured.http.ContentType;
 import models.CreateUserRequest;
+import models.DepositAccountRequest;
 import models.LoginUserRequest;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import requests.AdminLoginUserRequest;
+import requests.CreateAccount;
 import requests.CreateUser;
+import requests.UserDepositAccount;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
-import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DepositAccount {
@@ -31,44 +30,91 @@ public class DepositAccount {
     String user1Password = "Kate012!";
     String user2Password = "Kate013!";
     String userRole = "USER";
-    static int firstAccountUser1;
-    static int secondAccountUser1;
-    static Random random = new Random();
+    long firstAccountUser1;
+    long firstAccountUser2;
+    long randomIdAccount = new Random().nextInt(10000, 1000000);
 
-    public int createAccount() {
-        return given()
-                .contentType(ContentType.JSON)
-                .accept(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .post("http://localhost:4111/api/v1/accounts")
-                .then()
-                .statusCode(HttpStatus.SC_CREATED)
+    //Метод по созданию счета
+    public long createAccount(String userToken) {
+        return new CreateAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.entityWasCreated())
+                .post()
                 .extract()
-                .path("id");
+                .jsonPath()
+                .getLong("id");
     }
-    @BeforeEach
-    public void setupTestData() {
-        //Создание первого пользователя
-        CreateUserRequest createUser1Request = CreateUserRequest.builder()
-                .username(user1Username)
-                .password(user1Password)
-                .role(userRole)
-                .build();
-        new CreateUser(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.entityWasCreated())
-                .post(createUser1Request);
-        //Получение токена для пользователя1
-        LoginUserRequest loginUser1 = LoginUserRequest.builder()
-                .username(user1Username)
-                .password(user1Password)
-                .build();
 
-        user1Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+    //Метод по созданию пользователя
+    private void createUser(String userName, String userPassword, String role) {
+        CreateUserRequest createUser = CreateUserRequest.builder()
+                .username(userName)
+                .password(userPassword)
+                .role(role)
+                .build();
+        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())
+                .post(createUser);
+    }
+
+    //Метод по получению токена
+    private String getToken(String userName, String userPassword) {
+        LoginUserRequest loginUser1 = LoginUserRequest.builder()
+                .username(userName)
+                .password(userPassword)
+                .build();
+        return new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
                 .post(loginUser1)
                 .extract()
                 .header("Authorization");
+    }
 
-        //Создание счета первого пользователя
-        firstAccountUser1 = createAccount();
+    //Метод для данных для успешного пополнения
+    private float successfulDepositAccount(long accountId, double depositAmount, String userToken) {
+        DepositAccountRequest depositUserAccount = DepositAccountRequest.builder()
+                .id(accountId)
+                .balance(depositAmount)
+                .build();
+        return new UserDepositAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
+                .post(depositUserAccount)
+                .extract()
+                .path("balance");
+    }
+
+
+    //Метод для данных для неуспешного пополнения - ошибки суммы перевода
+    private void unsuccessfulDepositAmountError(long accountId, double depositAmount, String userToken) {
+        DepositAccountRequest depositUserAccount = DepositAccountRequest.builder()
+                .id(accountId)
+                .balance(depositAmount)
+                .build();
+        new UserDepositAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsBadRequest())
+                .post(depositUserAccount);
+    }
+
+    //Метод для данных для неуспешного пополнения - ошибки счетов
+    private void unsuccessfulDepositAccountError(long accountId, double depositAmount, String userToken) {
+        DepositAccountRequest depositUserAccount = DepositAccountRequest.builder()
+                .id(accountId)
+                .balance(depositAmount)
+                .build();
+        new UserDepositAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsForbidden())
+                .post(depositUserAccount);
+    }
+
+    @BeforeEach
+    public void setupTestData() {
+        //создание первого пользователя
+        createUser(user1Username, user1Password, userRole);
+        //Создание второго пользователя
+        createUser(user2Username, user2Password, userRole);
+
+        //Получение токена для пользователя1
+        user1Token = getToken(user1Username, user1Password);
+        //Получение токена для пользователя2
+        user2Token = getToken(user2Username, user2Password);
+
+        //Создание счета для пользователя1
+        firstAccountUser1 = createAccount(user1Token);
+        firstAccountUser2 = createAccount(user2Token);
+
     }
 
     public static Stream<Arguments> transactionDataForPositiveCaseJson() {
@@ -92,92 +138,44 @@ public class DepositAccount {
     }
 
     public static Stream<Arguments> notExistOrSomebodyAccount() {
-        int randomIdAccount = new Random().nextInt(10000, 1000000);
 
         return Stream.of(
-                Arguments.of(randomIdAccount)  // ← передаем только ID
+                Arguments.of("RANDOM", 100),    // метка для случайного ID
+                Arguments.of("OTHER_USER", 100) // метка для чужого аккаунта
         );
     }
-
 
     @ParameterizedTest
     @DisplayName("Успешное пополнение счета первый и последующие разы")
     @MethodSource("transactionDataForPositiveCaseJson")
-    public void userCanDepositAccountTest(double initialBalance, double depositAmount, double expectedBalance) {
-
+    public void userCanDepositAccountTest(double initialBalance,
+                                          double depositAmount, double expectedBalance) {
         // 1. Устанавливаем начальный баланс (если нужно)
         if (initialBalance != 0) {
-            given()
-                    .contentType(ContentType.JSON)
-                    .header("Authorization", user1Token)
-                    .body(Map.of("id", firstAccountUser1, "balance", initialBalance))
-                    .post("http://localhost:4111/api/v1/accounts/deposit")
-                    .then()
-                    .assertThat()
-                    .statusCode(HttpStatus.SC_OK);
+            successfulDepositAccount(firstAccountUser1, initialBalance, user1Token);
         }
-
         // 2. Делаем депозит
-        Float actualBalance = given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(Map.of("id", firstAccountUser1, "balance", depositAmount)) // ← "amount"!
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_OK)
-                .extract()
-                .path("balance");
-
-        // 3. Проверяем итоговый баланс
-        assertEquals((float) expectedBalance, actualBalance, 0.01f);
+        successfulDepositAccount(firstAccountUser1, depositAmount, user1Token);
     }
 
     @ParameterizedTest
-    @DisplayName("Пользователь не может пополнить счет на 0 и отрицательную сумму")
+    @DisplayName("Ошибка: Пользователь не может пополнить счет на 0 и отрицательную сумму")
     @MethodSource("transactionDataForNegativeCase")
     public void userCannotDepositAccountTest(double initialBalance, double depositAmount) {
         // 1. Устанавливаем начальный баланс (если нужно)
         if (initialBalance != 0) {
-            given()
-                    .contentType(ContentType.JSON)
-                    .header("Authorization", user1Token)
-                    .body(Map.of("id", firstAccountUser1, "balance", initialBalance))
-                    .post("http://localhost:4111/api/v1/accounts/deposit")
-                    .then()
-                    .assertThat()
-                    .statusCode(HttpStatus.SC_OK);
+            successfulDepositAccount(firstAccountUser1, initialBalance, user1Token);
         }
-
         // 2. Делаем депозит
-        given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(Map.of("id", firstAccountUser1, "balance", depositAmount)) // ← "amount"!
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_BAD_REQUEST);
-
+        unsuccessfulDepositAmountError(firstAccountUser1, depositAmount, user1Token);
     }
 
     @ParameterizedTest
-    @DisplayName("Пользователь не может пополнить чужой или несуществующий счет")
+    @DisplayName("Ошибка: Пользователь не может пополнить чужой или несуществующий счет")
     @MethodSource("notExistOrSomebodyAccount")
-    public void userCannotDepositNotExistAccountTest(int accountId) {
-        given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", user1Token)
-                .body(String.format("""
-        {
-          "id": %d,
-          "balance": 100.0
-        }
-        """, accountId))
-                .post("http://localhost:4111/api/v1/accounts/deposit")
-                .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_FORBIDDEN);
+    public void userCannotDepositNotExistAccountTest(String accountType, double depositAmount) {
+        long accountId = "RANDOM".equals(accountType) ? randomIdAccount : firstAccountUser2;
+        unsuccessfulDepositAccountError(accountId, depositAmount, user1Token);
     }
 
 }

@@ -3,34 +3,22 @@ package requests;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
-import models.CreateAccountRequest;
-
 import static io.restassured.RestAssured.given;
 
-public class CreateAccount extends PostRequest<CreateAccountRequest>{
-    public CreateAccount(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
-        super(requestSpecification, responseSpecification);
+public class CreateAccount {
+    private final RequestSpecification requestSpecification;
+    private final ResponseSpecification responseSpecification;
+
+    public CreateAccount(RequestSpecification requestSpec, ResponseSpecification responseSpec) {
+        this.requestSpecification = requestSpec;
+        this.responseSpecification = responseSpec;
     }
 
-    @Override
-    public ValidatableResponse post(CreateAccountRequest model) {
-        return
-                given()
-                        .spec(requestSpecification)
-                        .body(model)
-                        .post("/api/v1/accounts")
-                        .then()
-                        .spec(responseSpecification);
-
-    }
     public ValidatableResponse post() {
-        return
-                given()
-                        .spec(requestSpecification)
-                        .body("{}")
-                        .post("/api/v1/accounts")
-                        .then()
-                        .spec(responseSpecification);
-
+        return given()
+                .spec(requestSpecification)
+                .post("/api/v1/accounts") // ← Без .body()
+                .then()
+                .spec(responseSpecification);
     }
 }

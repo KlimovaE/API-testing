@@ -15,19 +15,19 @@ public class ResponseSpecs {
     }
 
     public static ResponseSpecification entityWasCreated() {
-        return defaultResponseBuilder()
+        return ResponseSpecs.defaultResponseBuilder()
                 .expectStatusCode(HttpStatus.SC_CREATED)
                 .build();
     }
 
     public static ResponseSpecification requestReturnsOK() {
-        return defaultResponseBuilder()
+        return ResponseSpecs.defaultResponseBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .build();
     }
 
     public static ResponseSpecification requestReturnOkAndCheckNewName(String newName) {
-        return defaultResponseBuilder()
+        return ResponseSpecs.defaultResponseBuilder()
                 .expectStatusCode(HttpStatus.SC_OK)
                 .expectBody("customer.name", equalTo(newName))
                 .build();
@@ -36,6 +36,16 @@ public class ResponseSpecs {
     public static ResponseSpecification requestReturnsBadRequest() {
         return ResponseSpecs.defaultResponseBuilder()
                 .expectStatusCode(HttpStatus.SC_BAD_REQUEST)
+                .build();
+    }
+
+    public static ResponseSpecification requestReturnsForbidden() {
+        return ResponseSpecs.defaultResponseBuilder()
+                .expectStatusCode(HttpStatus.SC_FORBIDDEN)
+                .build();
+    }
+    public static ResponseSpecification requestCanReturnAnyStatus() {
+        return new ResponseSpecBuilder()
                 .build();
     }
 }
