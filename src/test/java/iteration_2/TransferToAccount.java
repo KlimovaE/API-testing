@@ -32,6 +32,7 @@ public class TransferToAccount {
     int secondAccountUser1;
     int firstAccountUser2;
 
+    //Метод по созданию счетов
     public int createAccount(String userToken) {
         return given()
                 .contentType(ContentType.JSON)
@@ -68,6 +69,7 @@ public class TransferToAccount {
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
                 .header("Authorization");
+
         //Создание первого пользователя
         given()
                 .contentType(ContentType.JSON)
@@ -83,6 +85,7 @@ public class TransferToAccount {
                 .post("http://localhost:4111/api/v1/admin/users")
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
+
         //Создание второго пользователя
         given()
                 .contentType(ContentType.JSON)
@@ -98,6 +101,7 @@ public class TransferToAccount {
                 .post("http://localhost:4111/api/v1/admin/users")
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
+
         //Получение токена для пользователя1
         user1Token = given()
                 .contentType(ContentType.JSON)
@@ -113,6 +117,7 @@ public class TransferToAccount {
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
                 .header("Authorization");
+
         //Получение токена для пользователя2
         user2Token = given()
                 .contentType(ContentType.JSON)
@@ -128,6 +133,8 @@ public class TransferToAccount {
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
                 .header("Authorization");
+
+        //Создание 2 счета для пользователя1 и 1 счет для пользователя2
         firstAccountUser1 = createAccount(user1Token);
         secondAccountUser1 = createAccount(user1Token);
         firstAccountUser2 = createAccount(user2Token);
@@ -137,6 +144,7 @@ public class TransferToAccount {
     private void depositUserAccount(String userToken, int userAccount, double balance) {
         given()
                 .contentType(ContentType.JSON)
+                .header("Authorization", userToken)
                 .body(Map.of("id", userAccount, "balance", balance))
                 .post("http://localhost:4111/api/v1/accounts/deposit")
                 .then()
@@ -148,6 +156,11 @@ public class TransferToAccount {
                 Arguments.of(300, 0, 100, 200, 100),
                 Arguments.of(500, 100, 150, 350, 250),
                 Arguments.of(300, 0, 0.01, 299.99, 0.01),
+                Arguments.of(300, 0, 300, 0, 300),
+                //Гарантированная максимальная сумма перевода
+                Arguments.of(11000, 0, 9999.99, 1000.01, 9999.99),
+                //Проверка граничного значения(10.000 включительно?)
+                Arguments.of(11000, 0, 10000.00, 1000, 10000.00)
         );
     }
 
@@ -155,6 +168,10 @@ public class TransferToAccount {
         return Stream.of(
                 Arguments.of(300, 300.01),
                 Arguments.of(500, -100),
+                Arguments.of(300, 0),
+                //Превышение максимальной суммы перевода
+                Arguments.of(11000, 10000.01),
+                Arguments.of(11000, 10001)
         );
     }
 
@@ -200,7 +217,10 @@ public class TransferToAccount {
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK);
 
+        //Получаем баланс отправителя и получатели и проверяем, что после перевода изменился
+        double actualBalanceFirstAccountUser1 = JsonPath.from(getUserAmountsInfo(user1Token))
                 .getDouble("find { it.id == " + firstAccountUser1 + " }.balance");
+        double actualBalanceSecondAccountUser1 = JsonPath.from(getUserAmountsInfo(user1Token))
                 .getDouble("find { it.id == " + secondAccountUser1 + " }.balance");
 
         assertEquals(actualBalanceFirstAccountUser1, expectedFirstAccountUser1Balance, 0.01);
@@ -271,5 +291,4 @@ public class TransferToAccount {
                 .assertThat()
                 .statusCode(expectedStatusCode);
     }
-
 }
