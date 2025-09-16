@@ -3,6 +3,11 @@
 ### User2Token: Authorization: Basic a2F0ZTIwMjQ6S2F0ZTIwMjQh
 ### AdminToken: Authorization: Basic YWRtaW46YWRtaW4=
 
+###Метод для проверки имени после попытки изменения
+###Get user info
+GET http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
 
 ###Positive test: Update user's name from null
 ### user1 name null->kate
@@ -129,6 +134,28 @@ Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
   "balance": 0.01
 }
 
+###Positive test: make a maximum deposit
+### 300.01 + 4999.99 = 5300
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 1,
+  "balance": 4999.99
+}
+
+###Positive test: make a maximum deposit include 5000
+### 5300 + 5000 = 10300
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 1,
+  "balance": 5000
+}
+
 ###Corner test: make a deposit with 0
 ### 300.01 + 0
 POST http://localhost:4111/api/v1/accounts/deposit
@@ -180,6 +207,17 @@ Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
 {
   "id": 2,
   "balance": -100
+}
+
+###Negative test: make a negative deposit more, than maximum
+### 0 + 5000.01
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "id": 2,
+  "balance": 5000.01
 }
 
 ###Тестирование транзакций
@@ -242,6 +280,30 @@ Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
   "senderAccountId": 1,
   "receiverAccountId": 2,
   "amount": 29.9
+}
+
+###Positive test: make a maximum transfer
+### предварительно пополнить баланс на 9999.99
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 9999.99
+}
+
+###Positive test: make a maximum transfer, include 10000
+### предварительно пополнить баланс на 10000
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 10000
 }
 
 ###Negative test: make a transfer with zero
@@ -324,4 +386,16 @@ Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
   "senderAccountId": 2,
   "receiverAccountId": 2,
   "amount": 100
+}
+
+###Negative test: make a transfer more, then maximum
+### Предварительно пополнить баланс на 10000.01, что бы исключить ошибку недостаточного баланся для перевода
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 10000.01
 }
