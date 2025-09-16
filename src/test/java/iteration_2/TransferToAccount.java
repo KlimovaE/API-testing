@@ -252,6 +252,7 @@ public class TransferToAccount {
         int senderAccountId;
         int receiverAccountId;
         int randomNonExistentId = new Random().nextInt(100000, 1000000);
+        depositUserAccount(user1Token, firstAccountUser1, transferAmount);
 
         switch (testCase) {
             case "На несуществующий счет":
