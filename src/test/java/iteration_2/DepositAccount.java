@@ -28,9 +28,8 @@ public class DepositAccount {
     String user1Username = "A_" + System.currentTimeMillis(); // "kate001_123456"
     String user2Username = "B_" + System.currentTimeMillis(); // "kate002_123456"
     static int firstAccountUser1;
-    static int secondAccountUser1;
-    static Random random = new Random();
 
+    //Метод по созданию счетов
     public int createAccount() {
         return given()
                 .contentType(ContentType.JSON)
@@ -83,6 +82,7 @@ public class DepositAccount {
                 .post("http://localhost:4111/api/v1/admin/users")
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
+
         //Получение токена для пользователя1
         user1Token = given()
                 .contentType(ContentType.JSON)
@@ -98,16 +98,20 @@ public class DepositAccount {
                 .statusCode(HttpStatus.SC_OK)
                 .extract()
                 .header("Authorization");
-        //Create first account for user1
+
+        //Cоздание счета для пользователя1
         firstAccountUser1 = createAccount();
     }
 
     public static Stream<Arguments> transactionDataForPositiveCaseJson() {
-
         return Stream.of(
                 Arguments.of(0, 100, 100),
                 Arguments.of(100, 200, 300),
-                Arguments.of(300, 0.01, 300.01)
+                Arguments.of(300, 0.01, 300.01),
+                //Гарантированное максимальное пополнение
+                Arguments.of(0, 4999.99, 4999.99),
+                //Проверка границы максимальной суммы пополнения(включительно ли 5000)
+                Arguments.of(0, 5000, 5000)
         );
     }
 
@@ -118,24 +122,24 @@ public class DepositAccount {
                 Arguments.of(100, 0),
                 //Пополнение на отрицательную сумму
                 Arguments.of(0, -100),
-                Arguments.of(200, -100)
+                Arguments.of(200, -100),
+                //Превышение максимальной суммы пополнения
+                Arguments.of(0, 5000.01),
+                Arguments.of(0, 5001)
         );
     }
 
     public static Stream<Arguments> notExistOrSomebodyAccount() {
         int randomIdAccount = new Random().nextInt(10000, 1000000);
-
         return Stream.of(
-                Arguments.of(randomIdAccount)  // ← передаем только ID
+                Arguments.of(randomIdAccount)
         );
     }
-
 
     @ParameterizedTest
     @DisplayName("Успешное пополнение счета первый и последующие разы")
     @MethodSource("transactionDataForPositiveCaseJson")
     public void userCanDepositAccountTest(double initialBalance, double depositAmount, double expectedBalance) {
-
         // 1. Устанавливаем начальный баланс (если нужно)
         if (initialBalance != 0) {
             given()
@@ -148,7 +152,7 @@ public class DepositAccount {
                     .statusCode(HttpStatus.SC_OK);
         }
 
-        // 2. Делаем депозит
+        // 2. Делаем пополнение
         Float actualBalance = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", user1Token)
@@ -165,7 +169,7 @@ public class DepositAccount {
     }
 
     @ParameterizedTest
-    @DisplayName("Пользователь не может пополнить счет на 0 и отрицательную сумму")
+    @DisplayName("Ошибка: Пользователь не может пополнить счет на 0 и отрицательную сумму")
     @MethodSource("transactionDataForNegativeCase")
     public void userCannotDepositAccountTest(double initialBalance, double depositAmount) {
         // 1. Устанавливаем начальный баланс (если нужно)
@@ -180,7 +184,7 @@ public class DepositAccount {
                     .statusCode(HttpStatus.SC_OK);
         }
 
-        // 2. Делаем депозит
+        // 2. Делаем пополнение
         given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", user1Token)
@@ -189,13 +193,12 @@ public class DepositAccount {
                 .then()
                 .assertThat()
                 .statusCode(HttpStatus.SC_BAD_REQUEST);
-
     }
 
     @ParameterizedTest
-    @DisplayName("Пользователь не может пополнить чужой или несуществующий счет")
+    @DisplayName("Ошибка: Пользователь не может пополнить чужой или несуществующий счет")
     @MethodSource("notExistOrSomebodyAccount")
-    public void userCannotDepositNotExistAccountTest(int accountId) {
+    public void userCannotDepositNotExistOrSomebodyAccountTest(int accountId) {
         given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", user1Token)
