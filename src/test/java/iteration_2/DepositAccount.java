@@ -25,8 +25,8 @@ public class DepositAccount {
     String user1Token;
     String user2Token;
     //Генерация уникальных userName для каждого теста
-    String user1Username = "A_" + System.currentTimeMillis(); // "kate001_123456"
-    String user2Username = "B_" + System.currentTimeMillis(); // "kate002_123456"
+    String user1Username = "A_" + System.currentTimeMillis();
+    String user2Username = "B_" + System.currentTimeMillis();
     static int firstAccountUser1;
 
     //Метод по созданию счетов
