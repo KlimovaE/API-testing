@@ -1,0 +1,124 @@
+{
+  "customer": {
+    "id": 1,
+    "username": "kate2025",
+    "password": "$2a$10$KmhmIiVSzLu6xhDooy4u9OhhgHhrJBhOWuARG6nt/pbHZHTS3Utwe",
+    "name": "-:%;№!?*()+=,/\"'<>.-_",
+    "role": "USER",
+    "accounts": [
+      {
+        "id": 1,
+        "accountNumber": "ACC1",
+        "balance": 0.0899999999999963,
+        "transactions": [
+          {
+            "id": 8,
+            "amount": 0.01,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:37:18 UTC 2025",
+            "relatedAccountId": 2
+          },
+          {
+            "id": 1,
+            "amount": 100.0,
+            "type": "DEPOSIT",
+            "timestamp": "Tue Sep 02 23:27:29 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 10,
+            "amount": 100.01,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:38:30 UTC 2025",
+            "relatedAccountId": 3
+          },
+          {
+            "id": 12,
+            "amount": 29.9,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:43:28 UTC 2025",
+            "relatedAccountId": 2
+          },
+          {
+            "id": 6,
+            "amount": 70.0,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:36:51 UTC 2025",
+            "relatedAccountId": 2
+          },
+          {
+            "id": 3,
+            "amount": 0.01,
+            "type": "DEPOSIT",
+            "timestamp": "Tue Sep 02 23:28:17 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 4,
+            "amount": 100.0,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:35:33 UTC 2025",
+            "relatedAccountId": 2
+          },
+          {
+            "id": 2,
+            "amount": 200.0,
+            "type": "DEPOSIT",
+            "timestamp": "Tue Sep 02 23:27:52 UTC 2025",
+            "relatedAccountId": 1
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "accountNumber": "ACC2",
+        "balance": 199.91,
+        "transactions": [
+          {
+            "id": 15,
+            "amount": 100.0,
+            "type": "TRANSFER_IN",
+            "timestamp": "Tue Sep 02 23:46:02 UTC 2025",
+            "relatedAccountId": 2
+          },
+          {
+            "id": 9,
+            "amount": 0.01,
+            "type": "TRANSFER_IN",
+            "timestamp": "Tue Sep 02 23:37:18 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 7,
+            "amount": 70.0,
+            "type": "TRANSFER_IN",
+            "timestamp": "Tue Sep 02 23:36:51 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 13,
+            "amount": 29.9,
+            "type": "TRANSFER_IN",
+            "timestamp": "Tue Sep 02 23:43:28 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 5,
+            "amount": 100.0,
+            "type": "TRANSFER_IN",
+            "timestamp": "Tue Sep 02 23:35:33 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 14,
+            "amount": 100.0,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:46:02 UTC 2025",
+            "relatedAccountId": 2
+          }
+        ]
+      }
+    ]
+  },
+  "message": "Profile updated successfully"
+}

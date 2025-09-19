@@ -1,0 +1,115 @@
+[
+  {
+    "id": 1,
+    "username": "kate2025",
+    "password": "$2a$10$KmhmIiVSzLu6xhDooy4u9OhhgHhrJBhOWuARG6nt/pbHZHTS3Utwe",
+    "name": "    ",
+    "role": "USER",
+    "accounts": [
+      {
+        "id": 1,
+        "accountNumber": "ACC1",
+        "balance": 130.0,
+        "transactions": [
+          {
+            "id": 8,
+            "amount": 0.01,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:37:18 UTC 2025",
+            "relatedAccountId": 2
+          },
+          {
+            "id": 1,
+            "amount": 100.0,
+            "type": "DEPOSIT",
+            "timestamp": "Tue Sep 02 23:27:29 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 6,
+            "amount": 70.0,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:36:51 UTC 2025",
+            "relatedAccountId": 2
+          },
+          {
+            "id": 3,
+            "amount": 0.01,
+            "type": "DEPOSIT",
+            "timestamp": "Tue Sep 02 23:28:17 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 4,
+            "amount": 100.0,
+            "type": "TRANSFER_OUT",
+            "timestamp": "Tue Sep 02 23:35:33 UTC 2025",
+            "relatedAccountId": 2
+          },
+          {
+            "id": 2,
+            "amount": 200.0,
+            "type": "DEPOSIT",
+            "timestamp": "Tue Sep 02 23:27:52 UTC 2025",
+            "relatedAccountId": 1
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "accountNumber": "ACC2",
+        "balance": 170.01,
+        "transactions": [
+          {
+            "id": 9,
+            "amount": 0.01,
+            "type": "TRANSFER_IN",
+            "timestamp": "Tue Sep 02 23:37:18 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 7,
+            "amount": 70.0,
+            "type": "TRANSFER_IN",
+            "timestamp": "Tue Sep 02 23:36:51 UTC 2025",
+            "relatedAccountId": 1
+          },
+          {
+            "id": 5,
+            "amount": 100.0,
+            "type": "TRANSFER_IN",
+            "timestamp": "Tue Sep 02 23:35:33 UTC 2025",
+            "relatedAccountId": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "username": "kate2024",
+    "password": "$2a$10$fdXho3C91j4HPZbuE/Z07u6kG3OLBQVCzHSbxBQ3X9//wIfU62QdO",
+    "name": "kat",
+    "role": "USER",
+    "accounts": [
+      {
+        "id": 3,
+        "accountNumber": "ACC3",
+        "balance": 0.0,
+        "transactions": []
+      },
+      {
+        "id": 4,
+        "accountNumber": "ACC4",
+        "balance": 0.0,
+        "transactions": []
+      },
+      {
+        "id": 5,
+        "accountNumber": "ACC5",
+        "balance": 0.0,
+        "transactions": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,849 @@
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 26
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=3D4A7D23BB9713B3DBE24E565D45FF51
+
+{
+  "name": "1234567890"
+}
+
+<> 2025-09-10T141821.200.json
+
+###
+
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+Content-Length: 73
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=3D4A7D23BB9713B3DBE24E565D45FF51
+
+{
+  "username": "kate2025",
+  "password": "Kate2025!",
+  "role": "USER"
+}
+
+<> 2025-09-10T113207.400.txt
+
+###
+
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+Content-Length: 73
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=3D4A7D23BB9713B3DBE24E565D45FF51
+
+{
+  "username": "kate2025",
+  "password": "Kate2025!",
+  "role": "USER"
+}
+
+<> 2025-09-10T112351.201.json
+
+###
+
+POST http://localhost:4111/api/v1/auth/login
+Content-Type: application/json
+Content-Length: 48
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=3D4A7D23BB9713B3DBE24E565D45FF51
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+<> 2025-09-10T105921.200.json
+
+###
+
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+Content-Length: 73
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=3D4A7D23BB9713B3DBE24E565D45FF51
+
+{
+  "username": "kate2025",
+  "password": "Kate2025!",
+  "role": "USER"
+}
+
+<> 2025-09-09T152716.201.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=67B56E76A7AF7C816C76FEDFDDC8BAC7
+content-length: 0
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 72
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=67B56E76A7AF7C816C76FEDFDDC8BAC7
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 3,
+  "amount": 100.01
+}
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 70
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 29.9
+}
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 73
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 100500,
+  "receiverAccountId": 1,
+  "amount": 20
+}
+
+<> 2025-09-07T001503.403.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 73
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 100500,
+  "receiverAccountId": 1,
+  "amount": 20
+}
+
+<> 2025-09-07T000907.403.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 32
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 1,
+  "balance": 0.01
+}
+
+<> 2025-09-06T162055.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 31
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 1,
+  "balance": 200
+}
+
+<> 2025-09-05T194300.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 32
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 1,
+  "balance": 0.01
+}
+
+<> 2025-09-05T193013.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjQ6S2F0ZTIwMjQh
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+content-length: 0
+
+<> 2025-09-05T184708.201.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjQ6S2F0ZTIwMjQh
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+content-length: 0
+
+<> 2025-09-05T184556.201.json
+
+###
+
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 40
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "name": "-:%;№!?*()+=,/\"'<>.-_"
+}
+
+<> 2025-09-05T180226.200.json
+
+###
+
+POST http://localhost:4111/api/v1/auth/login
+Content-Type: application/json
+Content-Length: 48
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+<> 2025-09-05T095225.200.json
+
+###
+
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 19
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "name": "kat"
+}
+
+<> 2025-09-05T000109.200.json
+
+###
+
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 20
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "name": "kate"
+}
+
+<> 2025-09-04T235037.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 31
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 3,
+  "balance": 100
+}
+
+<> 2025-09-03T025537.403.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 36
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 100500,
+  "balance": 100
+}
+
+<> 2025-09-03T025533.403.txt
+
+###
+
+GET http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+<> 2025-09-03T024619.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 69
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 2,
+  "receiverAccountId": 2,
+  "amount": 100
+}
+
+<> 2025-09-03T024602.200.json
+
+###
+
+GET http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+<> 2025-09-03T024334.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 70
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 29.9
+}
+
+<> 2025-09-03T024328.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 69
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": -10
+}
+
+<> 2025-09-03T024151.400.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 68
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 30
+}
+
+<> 2025-09-03T024128.400.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 68
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 3,
+  "receiverAccountId": 1,
+  "amount": 20
+}
+
+<> 2025-09-03T024059.403.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 73
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 100500,
+  "receiverAccountId": 1,
+  "amount": 20
+}
+
+<> 2025-09-03T024040.403.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 73
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 100500,
+  "amount": 20
+}
+
+<> 2025-09-03T024017.400.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 67
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 3,
+  "amount": 0
+}
+
+<> 2025-09-03T023905.400.txt
+
+###
+
+GET http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+<> 2025-09-03T023835.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 72
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 3,
+  "amount": 100.01
+}
+
+<> 2025-09-03T023830.200.json
+
+###
+
+GET http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+<> 2025-09-03T023724.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 70
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 0.01
+}
+
+<> 2025-09-03T023718.200.json
+
+###
+
+GET http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+<> 2025-09-03T023702.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 68
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 70
+}
+
+<> 2025-09-03T023651.200.json
+
+###
+
+GET http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+<> 2025-09-03T023545.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 69
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "senderAccountId": 1,
+  "receiverAccountId": 2,
+  "amount": 100
+}
+
+<> 2025-09-03T023533.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 32
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 2,
+  "balance": -100
+}
+
+<> 2025-09-03T023200.400.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 32
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 3,
+  "balance": -100
+}
+
+<> 2025-09-03T023145.403.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 32
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 1,
+  "balance": -100
+}
+
+<> 2025-09-03T023111.400.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 31
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 5,
+  "balance": 100
+}
+
+<> 2025-09-03T023031.403.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 36
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 100500,
+  "balance": 100
+}
+
+<> 2025-09-03T022953.403.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 29
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 1,
+  "balance": 0
+}
+
+<> 2025-09-03T022834.400.txt
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 32
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 1,
+  "balance": 0.01
+}
+
+<> 2025-09-03T022817.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 31
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 1,
+  "balance": 200
+}
+
+<> 2025-09-03T022752.200.json
+
+###
+
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 31
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "id": 1,
+  "balance": 100
+}
+
+<> 2025-09-03T022729.200.json
+
+###
+
+GET http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+<> 2025-09-03T022427.200.json
+
+###
+
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh
+Content-Length: 20
+User-Agent: IntelliJ HTTP Client/Aqua 2024.3.2
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+Cookie: JSESSIONID=C0F72C3ABEAA160849092805E10CB7A5
+
+{
+  "name": "    "
+}
+
+<> 2025-09-03T022351.200.json
+
+###
+

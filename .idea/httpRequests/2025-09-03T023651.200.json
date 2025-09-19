@@ -1,0 +1,6 @@
+{
+  "senderAccountId": 1,
+  "message": "Transfer successful",
+  "amount": 70.0,
+  "receiverAccountId": 2
+}
