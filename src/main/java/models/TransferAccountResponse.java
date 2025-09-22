@@ -15,11 +15,3 @@ public class TransferAccountResponse extends BaseModel{
     private List<UserAccountsData> userAccountsData;
 }
 
-class UserAccountsData {
-    private long id;
-    private String accountNumber;
-    private double balance;
-    private String name;
-    private String role;
-    private List<String> transactions;
-}
