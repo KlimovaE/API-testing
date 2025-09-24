@@ -18,9 +18,7 @@ import spec.ResponseSpecs;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class DepositAccount {
+public class DepositAccount{
     String adminToken;
     String user1Token;
     String user2Token;
