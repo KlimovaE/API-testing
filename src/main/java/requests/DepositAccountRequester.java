@@ -3,12 +3,12 @@ package requests;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
-import models.DepositAccountRequest;
+import models.requsts.DepositAccountRequest;
 
 import static io.restassured.RestAssured.given;
 
-public class UserDepositAccount extends PostRequest<DepositAccountRequest> {
-    public UserDepositAccount(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+public class DepositAccountRequester extends PostRequest<DepositAccountRequest> {
+    public DepositAccountRequester(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
         super(requestSpecification, responseSpecification);
     }
 

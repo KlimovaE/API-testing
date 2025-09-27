@@ -1,4 +1,4 @@
-package models;
+package models.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

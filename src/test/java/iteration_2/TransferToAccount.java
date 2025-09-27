@@ -1,206 +1,287 @@
 package iteration_2;
 
-import io.restassured.path.json.JsonPath;
-import models.*;
-import org.apache.http.HttpStatus;
+import models.requsts.TransferAccountRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import requests.*;
+import requests.TransferToAccountRequest;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
+import steps.AccountCreationSteps;
+import steps.DepositSteps;
+import steps.GetActualBalanceSteps;
+import steps.UserGetTokenSteps;
+
 import java.util.Random;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.AssertionsForClassTypes.within;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TransferToAccount {
-    String user1Token;
-    String user2Token;
-    //Генерация уникальных userName для каждого теста
-    String user1Username = "A_" + System.currentTimeMillis();
-    String user2Username = "B_" + System.currentTimeMillis();
-    String user1Password = "Kate012!";
-    String user2Password = "Kate013!";
-    long firstAccountUser1;
+public class TransferToAccount extends BaseTest {
+    private final UserGetTokenSteps userGetTokenSteps = new UserGetTokenSteps();
+    private final AccountCreationSteps accountSteps = new AccountCreationSteps();
+    private final DepositSteps depositSteps = new DepositSteps();
+    private final GetActualBalanceSteps getActualBalance = new GetActualBalanceSteps();
+    private final double TRANSFER_AMOUNT = 100.00;
+    private final double INITIAL_BALANCE = 4999.99;
+    private String user1Token;
+    private String user2Token;
+    private long firstAccountUser1;
     long secondAccountUser1;
     long firstAccountUser2;
-    String userRole = "USER";
-    Random random = new Random();
     static long randomNonExistentId = new Random().nextInt(100000, 1000000);
 
     @BeforeEach
     public void setupTestData() {
-        //Создание первого пользователя
-        createUser(user1Username, user1Password, userRole);
-        //Создание второго пользователя
-        createUser(user2Username, user2Password, userRole);
+        //Получение токена для пользователей
+        user1Token = userGetTokenSteps.createRandomUserAndGetToken();
+        user2Token = userGetTokenSteps.createRandomUserAndGetToken();
 
-        //Получение токена для пользователя1
-        user1Token = getToken(user1Username, user1Password);
-        //Получение токена для пользователя2
-        user2Token = getToken(user2Username, user2Password);
+        //Создание счетов
+        firstAccountUser1 = accountSteps.createAccount(user1Token).getId();
+        secondAccountUser1 = accountSteps.createAccount(user1Token).getId();
+        firstAccountUser2 = accountSteps.createAccount(user2Token).getId();
 
-        //Создание 2х счетов для пользователя 1 и 1 счета для пользователя 2
-        firstAccountUser1 = createAccount(user1Token);
-        secondAccountUser1 = createAccount(user1Token);
-        firstAccountUser2 = createAccount(user2Token);
-    }
-
-    //Метод по созданию аккаунта
-    public long createAccount(String userToken) {
-
-        return new CreateAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.entityWasCreated())
-                .post()
-                .extract()
-                .jsonPath()
-                .getLong("id");
-    }
-
-    //Метод по созданию пользователя
-    private void createUser(String userName, String userPassword, String role) {
-        CreateUserRequest createUser = CreateUserRequest.builder()
-                .username(userName)
-                .password(userPassword)
-                .role(role)
-                .build();
-        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())
-                .post(createUser);
-    }
-
-    //Метод по получению токена
-    private String getToken(String userName, String userPassword) {
-        LoginUserRequest loginUser1 = LoginUserRequest.builder()
-                .username(userName)
-                .password(userPassword)
-                .build();
-        return new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
-                .post(loginUser1)
-                .extract()
-                .header("Authorization");
-    }
-    //Метод по предварительному пополнению баланса
-    private void depositUserAccount(String userToken, long userAccount, double balance) {
-        DepositAccountRequest depositAccountRequest = DepositAccountRequest.builder()
-                .id(userAccount)
-                .balance(balance)
-                .build();
-        new UserDepositAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
-                .post(depositAccountRequest);
-    }
-
-    private String getUserAmountsInfo(String userToken) {
-        return new GetCustomerProfileRequest(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
-                .get()
-                .extract()
-                .asString();// ← получаем как строку
-    }
-
-    //Метод по проверке баланса
-    private double actualAccountBalance(String userToken, long userAccount) {
-        return JsonPath.from(getUserAmountsInfo(userToken))
-                .getDouble("find { it.id == " + userAccount + " }.balance");
-    }
-
-    //Общий метод для успешных переводов (позитивные кейсы)
-    private void runPositiveTest(long senderAccount, long receiverAccount,
-                                 double initialSenderBalance, double initialReceiverBalance,
-                                 double transferAmount, String userSenderToken, String userReceiverToken) {
-
-        // Установка начального баланса
-        depositUserAccount(userSenderToken, senderAccount, initialSenderBalance);
-        if (initialReceiverBalance != 0) {
-            depositUserAccount(userReceiverToken, receiverAccount, initialReceiverBalance);
-        }
-
-        // Перевод
-        TransferAccountRequest request = TransferAccountRequest.builder()
-                .senderAccountId(senderAccount)
-                .receiverAccountId(receiverAccount)
-                .amount(transferAmount)
-                .build();
-
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(userSenderToken), ResponseSpecs.requestReturnsOK())
-                .post(request);
-        double actualSenderBalance = actualAccountBalance(userSenderToken, senderAccount);
-        double actualReceiverBalance = actualAccountBalance(userReceiverToken, receiverAccount);
-
-        //Проверка, что баланс отправителя уменьшился
-        assertEquals(initialSenderBalance-transferAmount, actualSenderBalance, 0.01);
-        //Проверка, что баланс получателя пополнился
-        assertEquals(initialReceiverBalance+transferAmount, actualReceiverBalance, 0.01);
-    }
-
-    //Общий метод пополнения для негативных запросов
-    private void runNegativeTest(long senderAccount, long receiverAccount,
-                                 double transferAmount, int expectedStatusCode) {
-        TransferAccountRequest request = TransferAccountRequest.builder()
-                .senderAccountId(senderAccount)
-                .receiverAccountId(receiverAccount)
-                .amount(transferAmount)
-                .build();
-
-        int actualStatusCode = new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
-                ResponseSpecs.requestCanReturnAnyStatus())
-                .post(request)
-                .extract()
-                .statusCode();
-
-        assertEquals(expectedStatusCode, actualStatusCode);
+        depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
     }
 
     public static Stream<Arguments> ownAccountsTransferData() {
         return Stream.of(
-                Arguments.of(300, 0, 100),
-                Arguments.of(500, 100, 150),
-                Arguments.of(300, 0, 0.01),
-                Arguments.of(300, 0, 300)
+                Arguments.of(100),//у получателя 0 на счету
+                Arguments.of( 150),//у получателя есть сумма на счету
+                Arguments.of(0.01),//минимальный перевод
+                Arguments.of(300)//вся сумма на счету отправителя
+        );
+    }
+
+    public static Stream<Arguments> maximumAmountTransferData() {
+        return Stream.of(
+                Arguments.of(9999.99),//максимально гарантированная возможная сумма к перевожу
+                Arguments.of(10000)//максимально возможная, граничное значение
+        );
+    }
+
+    public static Stream<Arguments> dataForNegativeTransitAmountErrorCases() {
+        return Stream.of(
+                //Перевод ноль
+                Arguments.of(0),
+                //Перевод на отрицательную сумму
+                Arguments.of(-5000),
+                Arguments.of(-100),
+                //Сумма превышающая баланс отправителя
+                Arguments.of(5000)
+        );
+    }
+
+    public static Stream<Arguments> dataForNegativeTransitAmountMoreThanMaximum() {
+        return Stream.of(
+                //Пополнение на превышающую максимальную сумму
+                Arguments.of(10000.01),
+                Arguments.of(10001)
         );
     }
 
     @ParameterizedTest
-    @DisplayName("Успешный перевод между своими счетами")
+    @DisplayName("Успешный перевод между своими счетами, счет получателя не ни разу пополнялся")
     @MethodSource("ownAccountsTransferData")
-    public void transferBetweenOwnAccounts(double initialSenderBalance, double initialReceiverBalance,
-                                           double transferAmount) {
+    public void transferBetweenOwnAccounts(double transferAmount) {
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser1)
+                .receiverAccountId(secondAccountUser1)
+                .amount(transferAmount)
+                .build();
 
-        runPositiveTest(firstAccountUser1, secondAccountUser1,
-                initialSenderBalance, initialReceiverBalance,
-                transferAmount, user1Token, user1Token);
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
+                .post(request);
 
+        double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        double actualReceiverBalance = getActualBalance.getActualAccountBalance(user1Token, secondAccountUser1);
+
+        //Проверка, что баланс отправителя уменьшился
+        softly.assertThat(actualSenderBalance).isEqualTo(INITIAL_BALANCE-transferAmount, within(0.01));
+        assertEquals(INITIAL_BALANCE-transferAmount, actualSenderBalance, 0.01);
+        //Проверка, что баланс получателя пополнился
+        softly.assertThat(actualReceiverBalance).isEqualTo(transferAmount, within(0.01));
+        }
+
+    @Test
+        @DisplayName("Успешный перевод между своими счетами, счет получателя имеет баланс")
+    public void transferBetweenOwnAccountsWithExistingBalance() {
+        // 1. Установка начального баланса получателя
+        depositSteps.depositAccount(secondAccountUser1, INITIAL_BALANCE, user1Token);
+
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser1)
+                .receiverAccountId(secondAccountUser1)
+                .amount(TRANSFER_AMOUNT)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
+                .post(request);
+
+        double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        double actualReceiverBalance = getActualBalance.getActualAccountBalance(user1Token, secondAccountUser1);
+
+        //Проверка, что баланс отправителя уменьшился
+        softly.assertThat(actualSenderBalance).isEqualTo(INITIAL_BALANCE-TRANSFER_AMOUNT, within(0.01));
+        //Проверка, что баланс получателя пополнился
+        softly.assertThat(actualReceiverBalance).isEqualTo(INITIAL_BALANCE+TRANSFER_AMOUNT, within(0.01));
+    }
+
+    @ParameterizedTest
+    @MethodSource("maximumAmountTransferData")
+    @DisplayName("Успешный перевод максимальной суммы")
+    public void transferMaximumAmount(double transferAmount) {
+        // 1. Дополнительное пополнение счета отправителя для суммы баланса больше 10000
+        depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
+        depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
+        double balanceAfterDeposit = INITIAL_BALANCE*3;// счет пополнили 3 раза до нужной суммы
+
+
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser1)
+                .receiverAccountId(secondAccountUser1)
+                .amount(transferAmount)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
+                .post(request);
+
+        double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        double actualReceiverBalance = getActualBalance.getActualAccountBalance(user1Token, secondAccountUser1);
+
+        //Проверка, что баланс отправителя уменьшился
+        softly.assertThat(actualSenderBalance).isEqualTo(balanceAfterDeposit, within(0.01));
+        //Проверка, что баланс получателя пополнился
+        softly.assertThat(actualReceiverBalance).isEqualTo(transferAmount, within(0.01));
     }
 
     @Test
     @DisplayName("Успешный перевод другому пользователю")
     public void transferToOtherUser() {
-        runPositiveTest(firstAccountUser1, firstAccountUser2, 300, 0, 0.01, user1Token, user2Token);
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser1)
+                .receiverAccountId(firstAccountUser2)
+                .amount(TRANSFER_AMOUNT)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
+                .post(request);
+
+        double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        double actualReceiverBalance = getActualBalance.getActualAccountBalance(user2Token, firstAccountUser2);
+
+        //Проверка, что баланс отправителя уменьшился
+        softly.assertThat(actualSenderBalance).isEqualTo(INITIAL_BALANCE-TRANSFER_AMOUNT, within(0.01));
+        //Проверка, что баланс получателя пополнился
+        softly.assertThat(actualReceiverBalance).isEqualTo(TRANSFER_AMOUNT, within(0.01));
     }
+
+    @ParameterizedTest
+    @MethodSource("dataForNegativeTransitAmountMoreThanMaximum")
+    @DisplayName("Ошибка: перевод суммы больше максимума")
+    public void cannotTransferTransitAmountMoreThanMaximumError(double transferAmount) {
+        depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
+        depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser1)
+                .receiverAccountId(firstAccountUser1)
+                .amount(transferAmount)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+                ResponseSpecs.requestReturnsBadRequest())
+                .post(request);
+
+        //Проверка, что баланс отправителя не изменился
+        double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        assertEquals(INITIAL_BALANCE, actualSenderBalance, 0.01);
+    }
+
+    @ParameterizedTest
+    @MethodSource("dataForNegativeTransitAmountErrorCases")
+    @DisplayName("Ошибка: перевод невалидной суммы")
+    public void cannotTransferTransitAmountError(double transferAmount) {
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser1)
+                .receiverAccountId(firstAccountUser1)
+                .amount(transferAmount)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+                ResponseSpecs.requestReturnsBadRequest())
+                .post(request);
+
+        //Проверка, что баланс отправителя не изменился
+        double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        assertEquals(INITIAL_BALANCE, actualSenderBalance, 0.01); }
 
     @Test
     @DisplayName("Ошибка: перевод с несуществующего счета")
     public void cannotTransferFromNonExistentAccount() {
-        runNegativeTest(randomNonExistentId, firstAccountUser1, 300.0, HttpStatus.SC_FORBIDDEN);
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(randomNonExistentId)
+                .receiverAccountId(firstAccountUser1)
+                .amount(TRANSFER_AMOUNT)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+                ResponseSpecs.requestReturnsForbidden())
+                .post(request);
     }
 
     @Test
     @DisplayName("Ошибка: перевод на несуществующий счет")
     public void cannotTransferToNonExistentAccount() {
-        runNegativeTest(firstAccountUser1, randomNonExistentId, 300.0, HttpStatus.SC_BAD_REQUEST);
+        depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser1)
+                .receiverAccountId(randomNonExistentId)
+                .amount(TRANSFER_AMOUNT)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+                ResponseSpecs.requestReturnsBadRequest())
+                .post(request);
+
+        //Проверка, что баланс отправителя не изменился
+        double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        assertEquals(INITIAL_BALANCE, actualSenderBalance, 0.01);
     }
 
     @Test
     @DisplayName("Ошибка: перевод с чужого счета")
     public void cannotTransferFromOtherUserAccount() {
-        runNegativeTest(firstAccountUser2, firstAccountUser1, 300.0, HttpStatus.SC_FORBIDDEN);
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser2)
+                .receiverAccountId(firstAccountUser1)
+                .amount(TRANSFER_AMOUNT)
+                .build();
+
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+                ResponseSpecs.requestReturnsForbidden())
+                .post(request);
     }
 
     @Test
     @DisplayName("Ошибка: счет получателя тот же, что и отправителя")
     public void cannotTransferToSameAccount() {
-        depositUserAccount(user1Token, firstAccountUser1, 500);
-        runNegativeTest(firstAccountUser1, firstAccountUser1, 300.0, HttpStatus.SC_BAD_REQUEST);
-    }
+        TransferAccountRequest request = TransferAccountRequest.builder()
+                .senderAccountId(firstAccountUser1)
+                .receiverAccountId(firstAccountUser1)
+                .amount(TRANSFER_AMOUNT)
+                .build();
 
+        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+                ResponseSpecs.requestReturnsBadRequest())
+                .post(request);
+
+        //Проверка, что баланс отправителя не изменился
+        double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        assertEquals(INITIAL_BALANCE, actualSenderBalance, 0.01);
+    }
 }

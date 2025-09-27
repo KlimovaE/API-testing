@@ -1,12 +1,20 @@
 package models;
 
+import lombok.*;
+
 import java.util.List;
 
-class UserAccountsData {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Getter
+
+public class Account extends BaseModel{
     private long id;
     private String accountNumber;
     private double balance;
     private String name;
     private String role;
-    private List<String> transactions;
+    private List<Transaction> transactions;
 }

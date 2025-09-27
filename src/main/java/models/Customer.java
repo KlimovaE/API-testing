@@ -1,22 +1,18 @@
 package models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateCustomerProfileResponse extends BaseModel {
-
+@Getter
+public class Customer extends BaseModel{
     private long id;
     private String username;
     private String password;
     private String role;
+    private String name;
     private List<String> accounts;
-
 }

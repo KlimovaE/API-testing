@@ -3,12 +3,12 @@ package requests;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
-import models.response.GetCustomerProfileResponse;
+import models.response.GetAccountsInfoResponse;
 
 import static io.restassured.RestAssured.given;
 
-public class GetCustomerProfileRequest extends GetRequest<GetCustomerProfileResponse> {
-    public GetCustomerProfileRequest(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+public class GetAccountInfoRequest extends GetRequest<GetAccountsInfoResponse> {
+    public GetAccountInfoRequest(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
         super(requestSpecification, responseSpecification);
     }
 
