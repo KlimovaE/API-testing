@@ -1,0 +1,446 @@
+Index: src/test/java/iteration_2/DepositAccount.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package iteration_2;\r\n\r\nimport io.restassured.http.ContentType;\r\nimport models.CreateUserRequest;\r\nimport models.LoginUserRequest;\r\nimport org.apache.http.HttpStatus;\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.DisplayName;\r\nimport org.junit.jupiter.params.ParameterizedTest;\r\nimport org.junit.jupiter.params.provider.Arguments;\r\nimport org.junit.jupiter.params.provider.MethodSource;\r\nimport requests.AdminLoginUserRequest;\r\nimport requests.CreateUser;\r\nimport spec.RequestSpecs;\r\nimport spec.ResponseSpecs;\r\n\r\nimport java.util.Map;\r\nimport java.util.Random;\r\nimport java.util.stream.Stream;\r\n\r\nimport static io.restassured.RestAssured.given;\r\nimport static org.junit.jupiter.api.Assertions.assertEquals;\r\n\r\npublic class DepositAccount {\r\n    String adminToken;\r\n    String user1Token;\r\n    String user2Token;\r\n    //Генерация уникальных userName для каждого теста\r\n    String user1Username = \"A_\" + System.currentTimeMillis(); // \"kate001_123456\"\r\n    String user2Username = \"B_\" + System.currentTimeMillis(); // \"kate002_123456\"\r\n    String user1Password = \"Kate012!\";\r\n    String user2Password = \"Kate013!\";\r\n    String userRole = \"USER\";\r\n    static int firstAccountUser1;\r\n    static int secondAccountUser1;\r\n    static Random random = new Random();\r\n\r\n    public int createAccount() {\r\n        return given()\r\n                .contentType(ContentType.JSON)\r\n                .accept(ContentType.JSON)\r\n                .header(\"Authorization\", user1Token)\r\n                .post(\"http://localhost:4111/api/v1/accounts\")\r\n                .then()\r\n                .statusCode(HttpStatus.SC_CREATED)\r\n                .extract()\r\n                .path(\"id\");\r\n    }\r\n    @BeforeEach\r\n    public void setupTestData() {\r\n        //Создание первого пользователя\r\n        CreateUserRequest createUser1Request = CreateUserRequest.builder()\r\n                .username(user1Username)\r\n                .password(user1Password)\r\n                .role(userRole)\r\n                .build();\r\n        new CreateUser(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.entityWasCreated())\r\n                .post(createUser1Request);\r\n        //Получение токена для пользователя1\r\n        LoginUserRequest loginUser1 = LoginUserRequest.builder()\r\n                .username(user1Username)\r\n                .password(user1Password)\r\n                .build();\r\n\r\n        user1Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())\r\n                .post(loginUser1)\r\n                .extract()\r\n                .header(\"Authorization\");\r\n\r\n        //Создание счета первого пользователя\r\n        firstAccountUser1 = createAccount();\r\n    }\r\n\r\n    public static Stream<Arguments> transactionDataForPositiveCaseJson() {\r\n\r\n        return Stream.of(\r\n                Arguments.of(0, 100, 100),\r\n                Arguments.of(100, 200, 300),\r\n                Arguments.of(300, 0.01, 300.01)\r\n        );\r\n    }\r\n\r\n    public static Stream<Arguments> transactionDataForNegativeCase() {\r\n        return Stream.of(\r\n                //Пополнение на ноль\r\n                Arguments.of(0, 0),\r\n                Arguments.of(100, 0),\r\n                //Пополнение на отрицательную сумму\r\n                Arguments.of(0, -100),\r\n                Arguments.of(200, -100)\r\n        );\r\n    }\r\n\r\n    public static Stream<Arguments> notExistOrSomebodyAccount() {\r\n        int randomIdAccount = new Random().nextInt(10000, 1000000);\r\n\r\n        return Stream.of(\r\n                Arguments.of(randomIdAccount)  // ← передаем только ID\r\n        );\r\n    }\r\n\r\n\r\n    @ParameterizedTest\r\n    @DisplayName(\"Успешное пополнение счета первый и последующие разы\")\r\n    @MethodSource(\"transactionDataForPositiveCaseJson\")\r\n    public void userCanDepositAccountTest(double initialBalance, double depositAmount, double expectedBalance) {\r\n\r\n        // 1. Устанавливаем начальный баланс (если нужно)\r\n        if (initialBalance != 0) {\r\n            given()\r\n                    .contentType(ContentType.JSON)\r\n                    .header(\"Authorization\", user1Token)\r\n                    .body(Map.of(\"id\", firstAccountUser1, \"balance\", initialBalance))\r\n                    .post(\"http://localhost:4111/api/v1/accounts/deposit\")\r\n                    .then()\r\n                    .assertThat()\r\n                    .statusCode(HttpStatus.SC_OK);\r\n        }\r\n\r\n        // 2. Делаем депозит\r\n        Float actualBalance = given()\r\n                .contentType(ContentType.JSON)\r\n                .header(\"Authorization\", user1Token)\r\n                .body(Map.of(\"id\", firstAccountUser1, \"balance\", depositAmount)) // ← \"amount\"!\r\n                .post(\"http://localhost:4111/api/v1/accounts/deposit\")\r\n                .then()\r\n                .assertThat()\r\n                .statusCode(HttpStatus.SC_OK)\r\n                .extract()\r\n                .path(\"balance\");\r\n\r\n        // 3. Проверяем итоговый баланс\r\n        assertEquals((float) expectedBalance, actualBalance, 0.01f);\r\n    }\r\n\r\n    @ParameterizedTest\r\n    @DisplayName(\"Пользователь не может пополнить счет на 0 и отрицательную сумму\")\r\n    @MethodSource(\"transactionDataForNegativeCase\")\r\n    public void userCannotDepositAccountTest(double initialBalance, double depositAmount) {\r\n        // 1. Устанавливаем начальный баланс (если нужно)\r\n        if (initialBalance != 0) {\r\n            given()\r\n                    .contentType(ContentType.JSON)\r\n                    .header(\"Authorization\", user1Token)\r\n                    .body(Map.of(\"id\", firstAccountUser1, \"balance\", initialBalance))\r\n                    .post(\"http://localhost:4111/api/v1/accounts/deposit\")\r\n                    .then()\r\n                    .assertThat()\r\n                    .statusCode(HttpStatus.SC_OK);\r\n        }\r\n\r\n        // 2. Делаем депозит\r\n        given()\r\n                .contentType(ContentType.JSON)\r\n                .header(\"Authorization\", user1Token)\r\n                .body(Map.of(\"id\", firstAccountUser1, \"balance\", depositAmount)) // ← \"amount\"!\r\n                .post(\"http://localhost:4111/api/v1/accounts/deposit\")\r\n                .then()\r\n                .assertThat()\r\n                .statusCode(HttpStatus.SC_BAD_REQUEST);\r\n\r\n    }\r\n\r\n    @ParameterizedTest\r\n    @DisplayName(\"Пользователь не может пополнить чужой или несуществующий счет\")\r\n    @MethodSource(\"notExistOrSomebodyAccount\")\r\n    public void userCannotDepositNotExistAccountTest(int accountId) {\r\n        given()\r\n                .contentType(ContentType.JSON)\r\n                .header(\"Authorization\", user1Token)\r\n                .body(String.format(\"\"\"\r\n        {\r\n          \"id\": %d,\r\n          \"balance\": 100.0\r\n        }\r\n        \"\"\", accountId))\r\n                .post(\"http://localhost:4111/api/v1/accounts/deposit\")\r\n                .then()\r\n                .assertThat()\r\n                .statusCode(HttpStatus.SC_FORBIDDEN);\r\n    }\r\n\r\n}
+===================================================================
+diff --git a/src/test/java/iteration_2/DepositAccount.java b/src/test/java/iteration_2/DepositAccount.java
+--- a/src/test/java/iteration_2/DepositAccount.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ b/src/test/java/iteration_2/DepositAccount.java	(date 1757594970592)
+@@ -1,19 +1,18 @@
+ package iteration_2;
+ 
++import io.restassured.RestAssured;
++import io.restassured.filter.log.RequestLoggingFilter;
++import io.restassured.filter.log.ResponseLoggingFilter;
+ import io.restassured.http.ContentType;
+-import models.CreateUserRequest;
+-import models.LoginUserRequest;
+ import org.apache.http.HttpStatus;
++import org.junit.jupiter.api.BeforeAll;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.DisplayName;
+ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.Arguments;
+ import org.junit.jupiter.params.provider.MethodSource;
+-import requests.AdminLoginUserRequest;
+-import requests.CreateUser;
+-import spec.RequestSpecs;
+-import spec.ResponseSpecs;
+ 
++import java.util.List;
+ import java.util.Map;
+ import java.util.Random;
+ import java.util.stream.Stream;
+@@ -28,9 +27,6 @@
+     //Генерация уникальных userName для каждого теста
+     String user1Username = "A_" + System.currentTimeMillis(); // "kate001_123456"
+     String user2Username = "B_" + System.currentTimeMillis(); // "kate002_123456"
+-    String user1Password = "Kate012!";
+-    String user2Password = "Kate013!";
+-    String userRole = "USER";
+     static int firstAccountUser1;
+     static int secondAccountUser1;
+     static Random random = new Random();
+@@ -46,28 +42,63 @@
+                 .extract()
+                 .path("id");
+     }
++
++    @BeforeAll
++    public static void setupRestAssured() {
++        RestAssured.filters(
++                List.of(new RequestLoggingFilter(),
++                        new ResponseLoggingFilter()));
++
++    }
++
+     @BeforeEach
+     public void setupTestData() {
++        //Получение токена для админа
++        adminToken = given()
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .body("""
++                        {
++                          "username": "admin",
++                          "password": "admin"
++                        }
++                        """)
++                .post("http://localhost:4111/api/v1/auth/login")
++                .then()
++                .statusCode(HttpStatus.SC_OK)
++                .extract()
++                .header("Authorization");
+         //Создание первого пользователя
+-        CreateUserRequest createUser1Request = CreateUserRequest.builder()
+-                .username(user1Username)
+-                .password(user1Password)
+-                .role(userRole)
+-                .build();
+-        new CreateUser(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.entityWasCreated())
+-                .post(createUser1Request);
++        given()
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .header("Authorization", adminToken)
++                .body(String.format("""
++                        {
++                          "username": "%s",
++                          "password": "Kate012!",
++                          "role": "USER"
++                        }
++                        """, user1Username))
++                .post("http://localhost:4111/api/v1/admin/users")
++                .then()
++                .statusCode(HttpStatus.SC_CREATED);
+         //Получение токена для пользователя1
+-        LoginUserRequest loginUser1 = LoginUserRequest.builder()
+-                .username(user1Username)
+-                .password(user1Password)
+-                .build();
+-
+-        user1Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+-                .post(loginUser1)
++        user1Token = given()
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .body(String.format("""
++                        {
++                          "username": "%s",
++                          "password": "Kate012!"
++                        }
++                        """, user1Username))
++                .post("http://localhost:4111/api/v1/auth/login")
++                .then()
++                .statusCode(HttpStatus.SC_OK)
+                 .extract()
+                 .header("Authorization");
+-
+-        //Создание счета первого пользователя
++        //Create first account for user1
+         firstAccountUser1 = createAccount();
+     }
+ 
+@@ -180,4 +211,4 @@
+                 .statusCode(HttpStatus.SC_FORBIDDEN);
+     }
+ 
+-}
+\ No newline at end of file
++}
+Index: src/test/java/iteration_2/UpdateUserName.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package iteration_2;\r\n\r\nimport io.restassured.http.ContentType;\r\nimport models.CreateUserRequest;\r\nimport models.LoginUserRequest;\r\nimport models.UpdateCustomerProfileRequest;\r\nimport org.apache.http.HttpStatus;\r\nimport org.junit.jupiter.api.BeforeEach;\r\nimport org.junit.jupiter.api.DisplayName;\r\nimport org.junit.jupiter.api.Test;\r\nimport org.junit.jupiter.params.ParameterizedTest;\r\nimport org.junit.jupiter.params.provider.Arguments;\r\nimport org.junit.jupiter.params.provider.MethodSource;\r\nimport requests.AdminLoginUserRequest;\r\nimport requests.CreateUser;\r\nimport requests.UpdateCustomerProfile;\r\nimport spec.RequestSpecs;\r\nimport spec.ResponseSpecs;\r\n\r\nimport java.util.stream.Stream;\r\n\r\nimport static io.restassured.RestAssured.given;\r\nimport static org.hamcrest.Matchers.equalTo;\r\n\r\n\r\npublic class UpdateUserName {\r\n    String adminToken = \"Basic YWRtaW46YWRtaW4=\";\r\n    String user1Token;\r\n    String user2Token;\r\n    String user1Password = \"Kate012!\";\r\n    String user2Password = \"Kate013!\";\r\n    //Генерация уникальных userName для каждого теста\r\n    String user1Username = \"A_\" + System.currentTimeMillis(); // \"kate001_123456\"\r\n    String user2Username = \"B_\" + System.currentTimeMillis(); // \"kate002_123456\"\r\n    String userRole = \"USER\";\r\n\r\n\r\n    @BeforeEach\r\n    public void setupTestData() {\r\n        //создание первого пользователя(middle)\r\n        CreateUserRequest userRequest = CreateUserRequest.builder().\r\n                username(user1Username)\r\n                .password(user1Password)\r\n                .role(userRole)\r\n                .build();\r\n        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())\r\n                .post(userRequest);\r\n\r\n        //Создание второго пользователя\r\n        CreateUserRequest userRequest2 = CreateUserRequest.builder()\r\n                .username(user2Username)\r\n                .password(user2Password)\r\n                .role(userRole)\r\n                .build();\r\n        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())\r\n                .post(userRequest2);\r\n\r\n        //Получение токена для пользователя1\r\n        LoginUserRequest loginUser1Request = LoginUserRequest.builder()\r\n                .username(user1Username)\r\n                .password(user1Password)\r\n                .build();\r\n        user1Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())\r\n                .post(loginUser1Request)\r\n                .extract()\r\n                .header(\"Authorization\");\r\n\r\n        //Получение токена для пользователя2\r\n        LoginUserRequest loginUser2Request = LoginUserRequest.builder()\r\n                .username(user2Username)\r\n                .password(user2Password)\r\n                .build();\r\n\r\n        user2Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())\r\n                .post(loginUser2Request)\r\n                .extract()\r\n                .header(\"Authorization\");\r\n    }\r\n\r\n    public static Stream<Arguments> validNameData() {\r\n        return Stream.of(\r\n                //Update name from null (null->kate)\r\n                Arguments.of(null, \"Kate\"),\r\n                //Update user's name to another valid name (kate->kat\r\n                Arguments.of(\"Kate\", \"Kat\"),\r\n                //Update name to duplicate name(kat->kat)\r\n                Arguments.of(\"Kat\", \"Kat\"),\r\n                //Update name - use all type symbols(kat->Kate 1234567890:%;№\"!?*()+=,/\\'<>.-_)\r\n                Arguments.of(\"Kat\", \"Kate 1234567890:%;№!?*()+=,/'<>.-_\")\r\n        );\r\n    }\r\n\r\n    public static Stream<Arguments> nameDataForCornerCases() {\r\n        return Stream.of(\r\n                //only special symbols\r\n                Arguments.of(\"-:%;№!?*()+=,/\\\"'<>.-_\"),\r\n                //only numbers\r\n                Arguments.of(\"1234567890\")\r\n        );\r\n    }\r\n\r\n    public static Stream<Arguments> nameDataForNegativeCases() {\r\n        return Stream.of(\r\n                //only special symbols\r\n                Arguments.of(\"\"),\r\n                //only numbers\r\n                Arguments.of(\"   \")\r\n        );\r\n    }\r\n\r\n    @ParameterizedTest\r\n    @MethodSource(\"validNameData\")\r\n    @DisplayName(\"Пользователь может изменить имя с null и с другого значения\")\r\n    public void userCanUpdateNameTest(String initialName, String newName) {\r\n        // Если initialName не null, сначала устанавливаем его\r\n        if (initialName != null) {\r\n            //передаем в json initialName\r\n            UpdateCustomerProfileRequest updateUser1 = UpdateCustomerProfileRequest.builder()\r\n                    .name(initialName)\r\n                    .build();\r\n            new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), initialName)\r\n                    .put(updateUser1);\r\n\r\n            given()\r\n                    .spec(RequestSpecs.userAuthSpec(user1Token))\r\n                    .body(updateUser1)\r\n                    .put(\"/api/v1/customer/profile\")\r\n                    .then()\r\n                    .assertThat()\r\n                    .spec(ResponseSpecs.requestReturnOkAndCheckNewName(initialName));\r\n\r\n        }\r\n\r\n        // Теперь меняем имя на новое\r\n        UpdateCustomerProfileRequest updateUser1 = UpdateCustomerProfileRequest.builder()\r\n                .name(newName)\r\n                .build();\r\n        new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), newName)\r\n        .put(updateUser1);\r\n\r\n        given()\r\n                .spec(RequestSpecs.userAuthSpec(user1Token))\r\n                .body(updateUser1)\r\n                .put(\"/api/v1/customer/profile\")\r\n                .then()\r\n                .assertThat()\r\n                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(newName));\r\n    }\r\n\r\n    @Test\r\n    @DisplayName(\"Пользователь может изменить себе имя на имя у другого пользователя\")\r\n    public void userCanUpdateNameToNameAnotherUserTest() {\r\n        String duplicateName = \"UserKate\";\r\n        // Задаем имя первому пользователю\r\n        UpdateCustomerProfileRequest user1update = UpdateCustomerProfileRequest.builder()\r\n                .name(duplicateName)\r\n                .build();\r\n        given()\r\n                .spec(RequestSpecs.userAuthSpec(user1Token))\r\n                .body(user1update)\r\n                .put(\"/api/v1/customer/profile\")\r\n                .then()\r\n                .assertThat()\r\n                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(duplicateName));\r\n\r\n        // Задаем имя первого пользователя второму\r\n        UpdateCustomerProfileRequest user2update = UpdateCustomerProfileRequest.builder()\r\n                .name(duplicateName)\r\n                .build();\r\n        given()\r\n                .spec(RequestSpecs.userAuthSpec(user2Token))\r\n                .body(user1update)\r\n                .put(\"/api/v1/customer/profile\")\r\n                .then()\r\n                .assertThat()\r\n                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(duplicateName));\r\n    }\r\n\r\n    @ParameterizedTest\r\n    @MethodSource(\"nameDataForCornerCases\")\r\n    @DisplayName(\"Пользователь может изменить имя на значение только из символов или чисел\")\r\n    public void useOnlySpecialSymbolsOrNumbersForNameTest(String newName) {\r\n        given()\r\n                .contentType(ContentType.JSON)\r\n                .accept(ContentType.JSON)\r\n                .header(\"Authorization\", user1Token)\r\n                //Вручную: JSON валиден, кавычки правильно экранированы\r\n                //В тесте: String.format() может некорректно обработать \\\" и ' в строке\r\n                .body(String.format(\"\"\"\r\n                        {\r\n                        \"name\":\"%s\"\r\n                        }\r\n                        \"\"\", newName.replace(\"\\\"\", \"\\\\\\\"\")))// ← Экранируем кавычки!\r\n                .put(\"http://localhost:4111/api/v1/customer/profile\")\r\n                .then()\r\n                .assertThat()\r\n                .statusCode(HttpStatus.SC_OK)\r\n                .body(\"customer.name\", equalTo(newName));\r\n\r\n    }\r\n\r\n    @ParameterizedTest\r\n    @MethodSource(\"nameDataForNegativeCases\")\r\n    @DisplayName(\"Пользователь не может изменить имя на невалидное значение(пустое, только пробелы)\")\r\n    public void userCannotUpdateNameWithInvalidValue(String newName) {\r\n        UpdateCustomerProfileRequest user1update = UpdateCustomerProfileRequest.builder()\r\n                .name(newName)\r\n                .build();\r\n        given()\r\n                .spec(RequestSpecs.userAuthSpec(user1Token))\r\n                .body(user1update)\r\n                .put(\"/api/v1/customer/profile\")\r\n                .then()\r\n                .assertThat()\r\n                .spec(ResponseSpecs.requestReturnsBadRequest());\r\n    }\r\n\r\n}
+===================================================================
+diff --git a/src/test/java/iteration_2/UpdateUserName.java b/src/test/java/iteration_2/UpdateUserName.java
+--- a/src/test/java/iteration_2/UpdateUserName.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ b/src/test/java/iteration_2/UpdateUserName.java	(date 1757595004165)
+@@ -1,22 +1,19 @@
+ package iteration_2;
+ 
++import io.restassured.RestAssured;
++import io.restassured.filter.log.RequestLoggingFilter;
++import io.restassured.filter.log.ResponseLoggingFilter;
+ import io.restassured.http.ContentType;
+-import models.CreateUserRequest;
+-import models.LoginUserRequest;
+-import models.UpdateCustomerProfileRequest;
+ import org.apache.http.HttpStatus;
++import org.junit.jupiter.api.BeforeAll;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.DisplayName;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.Arguments;
+ import org.junit.jupiter.params.provider.MethodSource;
+-import requests.AdminLoginUserRequest;
+-import requests.CreateUser;
+-import requests.UpdateCustomerProfile;
+-import spec.RequestSpecs;
+-import spec.ResponseSpecs;
+ 
++import java.util.List;
+ import java.util.stream.Stream;
+ 
+ import static io.restassured.RestAssured.given;
+@@ -24,55 +21,100 @@
+ 
+ 
+ public class UpdateUserName {
+-    String adminToken = "Basic YWRtaW46YWRtaW4=";
++    String adminToken;
+     String user1Token;
+     String user2Token;
+-    String user1Password = "Kate012!";
+-    String user2Password = "Kate013!";
+     //Генерация уникальных userName для каждого теста
+     String user1Username = "A_" + System.currentTimeMillis(); // "kate001_123456"
+     String user2Username = "B_" + System.currentTimeMillis(); // "kate002_123456"
+-    String userRole = "USER";
+ 
++    @BeforeAll
++    public static void setupRestAssured() {
++        RestAssured.filters(
++                List.of(new RequestLoggingFilter(),
++                        new ResponseLoggingFilter()));
+ 
++    }
+     @BeforeEach
+     public void setupTestData() {
+-        //создание первого пользователя(middle)
+-        CreateUserRequest userRequest = CreateUserRequest.builder().
+-                username(user1Username)
+-                .password(user1Password)
+-                .role(userRole)
+-                .build();
+-        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())
+-                .post(userRequest);
+-
++        //Получение токена для админа
++        adminToken = given()
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .body("""
++                        {
++                          "username": "admin",
++                          "password": "admin"
++                        }
++                        """)
++                .post("http://localhost:4111/api/v1/auth/login")
++                .then()
++                .assertThat()
++                .statusCode(HttpStatus.SC_OK)
++                .extract()
++                .header("Authorization");
++        //Создание первого пользователя
++        given()
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .header("Authorization", adminToken)
++                .body(String.format("""
++                        {
++                          "username": "%s",
++                          "password": "Kate012!",
++                          "role": "USER"
++                        }
++                        """, user1Username))
++                .post("http://localhost:4111/api/v1/admin/users")
++                .then()
++                .assertThat()
++                .statusCode(HttpStatus.SC_CREATED);
+         //Создание второго пользователя
+-        CreateUserRequest userRequest2 = CreateUserRequest.builder()
+-                .username(user2Username)
+-                .password(user2Password)
+-                .role(userRole)
+-                .build();
+-        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())
+-                .post(userRequest2);
+-
++        given()
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .header("Authorization", adminToken)
++                .body(String.format("""
++                        {
++                          "username": "%s",
++                          "password": "Kate013!",
++                          "role": "USER"
++                        }
++                        """, user2Username))
++                .post("http://localhost:4111/api/v1/admin/users")
++                .then()
++                .assertThat()
++                .statusCode(HttpStatus.SC_CREATED);
+         //Получение токена для пользователя1
+-        LoginUserRequest loginUser1Request = LoginUserRequest.builder()
+-                .username(user1Username)
+-                .password(user1Password)
+-                .build();
+-        user1Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+-                .post(loginUser1Request)
++        user1Token = given()
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .body(String.format("""
++                        {
++                          "username": "%s",
++                          "password": "Kate012!"
++                        }
++                        """, user1Username))
++                .post("http://localhost:4111/api/v1/auth/login")
++                .then()
++                .assertThat()
++                .statusCode(HttpStatus.SC_OK)
+                 .extract()
+                 .header("Authorization");
+-
+         //Получение токена для пользователя2
+-        LoginUserRequest loginUser2Request = LoginUserRequest.builder()
+-                .username(user2Username)
+-                .password(user2Password)
+-                .build();
+-
+-        user2Token = new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+-                .post(loginUser2Request)
++        user2Token = given()
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .body(String.format("""
++                        {
++                          "username": "%s",
++                          "password": "Kate013!"
++                        }
++                        """, user2Username))
++                .post("http://localhost:4111/api/v1/auth/login")
++                .then()
++                .assertThat()
++                .statusCode(HttpStatus.SC_OK)
+                 .extract()
+                 .header("Authorization");
+     }
+@@ -114,66 +156,74 @@
+     public void userCanUpdateNameTest(String initialName, String newName) {
+         // Если initialName не null, сначала устанавливаем его
+         if (initialName != null) {
+-            //передаем в json initialName
+-            UpdateCustomerProfileRequest updateUser1 = UpdateCustomerProfileRequest.builder()
+-                    .name(initialName)
+-                    .build();
+-            new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), initialName)
+-                    .put(updateUser1);
+-
+             given()
+-                    .spec(RequestSpecs.userAuthSpec(user1Token))
+-                    .body(updateUser1)
+-                    .put("/api/v1/customer/profile")
++                    .contentType(ContentType.JSON)
++                    .accept(ContentType.JSON)
++                    .header("Authorization", user1Token)
++                    .body(String.format("""
++                        {
++                          "name": "%s"
++                        }
++                        """, initialName))
++                    .put("http://localhost:4111/api/v1/customer/profile")
+                     .then()
+                     .assertThat()
+-                    .spec(ResponseSpecs.requestReturnOkAndCheckNewName(initialName));
++                    .statusCode(HttpStatus.SC_OK)
++                    .body("customer.name", equalTo(initialName));
+ 
+         }
+ 
+         // Теперь меняем имя на новое
+-        UpdateCustomerProfileRequest updateUser1 = UpdateCustomerProfileRequest.builder()
+-                .name(newName)
+-                .build();
+-        new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), newName)
+-        .put(updateUser1);
+-
+         given()
+-                .spec(RequestSpecs.userAuthSpec(user1Token))
+-                .body(updateUser1)
+-                .put("/api/v1/customer/profile")
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .header("Authorization", user1Token)
++                .body(String.format("""
++                        {
++                          "name": "%s"
++                        }
++                        """, newName))
++                .put("http://localhost:4111/api/v1/customer/profile")
+                 .then()
+                 .assertThat()
+-                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(newName));
++                .statusCode(HttpStatus.SC_OK)
++                .body("customer.name", equalTo(newName));
+     }
+-
+     @Test
+     @DisplayName("Пользователь может изменить себе имя на имя у другого пользователя")
+     public void userCanUpdateNameToNameAnotherUserTest() {
+         String duplicateName = "UserKate";
+         // Задаем имя первому пользователю
+-        UpdateCustomerProfileRequest user1update = UpdateCustomerProfileRequest.builder()
+-                .name(duplicateName)
+-                .build();
+         given()
+-                .spec(RequestSpecs.userAuthSpec(user1Token))
+-                .body(user1update)
+-                .put("/api/v1/customer/profile")
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .header("Authorization", user1Token)
++                .body(String.format("""
++                        {
++                          "name": "%s"
++                        }
++                        """, duplicateName))
++                .put("http://localhost:4111/api/v1/customer/profile")
+                 .then()
+                 .assertThat()
+-                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(duplicateName));
++                .statusCode(HttpStatus.SC_OK)
++                .body("customer.name", equalTo(duplicateName));
+ 
+         // Задаем имя первого пользователя второму
+-        UpdateCustomerProfileRequest user2update = UpdateCustomerProfileRequest.builder()
+-                .name(duplicateName)
+-                .build();
+         given()
+-                .spec(RequestSpecs.userAuthSpec(user2Token))
+-                .body(user1update)
+-                .put("/api/v1/customer/profile")
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .header("Authorization", user2Token)
++                .body(String.format("""
++                        {
++                          "name": "%s"
++                        }
++                        """, duplicateName))
++                .put("http://localhost:4111/api/v1/customer/profile")
+                 .then()
+                 .assertThat()
+-                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(duplicateName));
++                .statusCode(HttpStatus.SC_OK)
++                .body("customer.name", equalTo(duplicateName));
+     }
+ 
+     @ParameterizedTest
+@@ -198,21 +248,23 @@
+                 .body("customer.name", equalTo(newName));
+ 
+     }
+-
+     @ParameterizedTest
+     @MethodSource("nameDataForNegativeCases")
+     @DisplayName("Пользователь не может изменить имя на невалидное значение(пустое, только пробелы)")
+     public void userCannotUpdateNameWithInvalidValue(String newName) {
+-        UpdateCustomerProfileRequest user1update = UpdateCustomerProfileRequest.builder()
+-                .name(newName)
+-                .build();
+         given()
+-                .spec(RequestSpecs.userAuthSpec(user1Token))
+-                .body(user1update)
+-                .put("/api/v1/customer/profile")
++                .contentType(ContentType.JSON)
++                .accept(ContentType.JSON)
++                .header("Authorization", user1Token)
++                .body(String.format("""
++                        {
++                        "name":"%s"
++                        }
++                        """, newName))
++                .put("http://localhost:4111/api/v1/customer/profile")
+                 .then()
+                 .assertThat()
+-                .spec(ResponseSpecs.requestReturnsBadRequest());
++                .statusCode(HttpStatus.SC_BAD_REQUEST);
+     }
+ 
+ }
+\ No newline at end of file

@@ -1,0 +1,533 @@
+Index: src/main/java/models/CreateUserRequest.java
+===================================================================
+diff --git a/src/main/java/models/CreateUserRequest.java b/src/main/java/models/CreateUserRequest.java
+deleted file mode 100644
+--- a/src/main/java/models/CreateUserRequest.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,17 +0,0 @@
+-package models;
+-
+-
+-import lombok.AllArgsConstructor;
+-import lombok.Builder;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-@Data
+-@NoArgsConstructor
+-@AllArgsConstructor
+-@Builder
+-public class CreateUserRequest extends BaseModel {
+-    private String username;
+-    private String password;
+-    private String role;
+-}
+Index: src/main/java/models/CreateUserResponse.java
+===================================================================
+diff --git a/src/main/java/models/CreateUserResponse.java b/src/main/java/models/CreateUserResponse.java
+deleted file mode 100644
+--- a/src/main/java/models/CreateUserResponse.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,19 +0,0 @@
+-package models;
+-
+-import lombok.AllArgsConstructor;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-import java.util.List;
+-
+-@Data
+-@AllArgsConstructor
+-@NoArgsConstructor
+-public class CreateUserResponse {
+-        private long id;
+-        private String username;
+-        private String password;
+-        private String  name;
+-        private String role;
+-        private List<String> accounts;
+-}
+Index: src/main/java/models/DepositAccountResponse.java
+===================================================================
+diff --git a/src/main/java/models/DepositAccountResponse.java b/src/main/java/models/DepositAccountResponse.java
+deleted file mode 100644
+--- a/src/main/java/models/DepositAccountResponse.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,21 +0,0 @@
+-package models;
+-
+-import lombok.AllArgsConstructor;
+-import lombok.Builder;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-import java.util.List;
+-
+-
+-@Data
+-@AllArgsConstructor
+-@NoArgsConstructor
+-@Builder
+-public class DepositAccountResponse <T extends Number> extends BaseModel {
+-    private long id;
+-    private String accountNumber;
+-    private T balance;
+-    private List<Transaction> transactions;
+-
+-}
+Index: src/main/java/models/UpdateCustomerProfileRequest.java
+===================================================================
+diff --git a/src/main/java/models/UpdateCustomerProfileRequest.java b/src/main/java/models/UpdateCustomerProfileRequest.java
+deleted file mode 100644
+--- a/src/main/java/models/UpdateCustomerProfileRequest.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,15 +0,0 @@
+-package models;
+-
+-import lombok.AllArgsConstructor;
+-import lombok.Builder;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-@Data
+-@NoArgsConstructor
+-@AllArgsConstructor
+-@Builder
+-
+-public class UpdateCustomerProfileRequest extends BaseModel{
+-    private String name;
+-}
+Index: src/main/java/requests/PostRequest.java
+===================================================================
+diff --git a/src/main/java/requests/PostRequest.java b/src/main/java/requests/PostRequest.java
+deleted file mode 100644
+--- a/src/main/java/requests/PostRequest.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,18 +0,0 @@
+-package requests;
+-
+-import io.restassured.response.ValidatableResponse;
+-import io.restassured.specification.RequestSpecification;
+-import io.restassured.specification.ResponseSpecification;
+-import models.BaseModel;
+-
+-public abstract class PostRequest<T extends BaseModel> {
+-    protected RequestSpecification requestSpecification;// как отправлять
+-    protected ResponseSpecification responseSpecification;// что ожидать в ответ
+-
+-    public PostRequest(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+-        this.requestSpecification = requestSpecification;
+-        this.responseSpecification = responseSpecification;
+-    }
+-
+-    public abstract ValidatableResponse post(T model);
+-}
+Index: src/main/java/spec/RequestSpecs.java
+===================================================================
+diff --git a/src/main/java/spec/RequestSpecs.java b/src/main/java/spec/RequestSpecs.java
+deleted file mode 100644
+--- a/src/main/java/spec/RequestSpecs.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,40 +0,0 @@
+-package spec;
+-
+-import io.restassured.builder.RequestSpecBuilder;
+-import io.restassured.filter.log.RequestLoggingFilter;
+-import io.restassured.filter.log.ResponseLoggingFilter;
+-import io.restassured.http.ContentType;
+-import io.restassured.specification.RequestSpecification;
+-
+-import java.util.List;
+-
+-public class RequestSpecs {
+-    private RequestSpecs() {
+-    }
+-
+-    private static RequestSpecBuilder defaultRequestBuilder() {
+-        return new RequestSpecBuilder()
+-                .setContentType(ContentType.JSON)
+-                .setAccept(ContentType.JSON)
+-                .addFilters(List.of(new RequestLoggingFilter(),
+-                        new ResponseLoggingFilter()))
+-                .setBaseUri("http://localhost:4111");
+-    }
+-
+-    public static RequestSpecification unAuthSpec() {
+-        return defaultRequestBuilder().build();
+-    }
+-
+-    public static RequestSpecification adminAuthSpec() {
+-        return defaultRequestBuilder()
+-                .addHeader("Authorization", "Basic YWRtaW46YWRtaW4=")
+-                .build();
+-    }
+-
+-    public static RequestSpecification userAuthSpec(String token) {
+-        return defaultRequestBuilder()
+-                .addHeader("Authorization", token)
+-                .build();
+-
+-    }
+-}
+Index: src/main/java/models/CreateAccountRequest.java
+===================================================================
+diff --git a/src/main/java/models/CreateAccountRequest.java b/src/main/java/models/CreateAccountRequest.java
+deleted file mode 100644
+--- a/src/main/java/models/CreateAccountRequest.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,4 +0,0 @@
+-package models;
+-
+-public class CreateAccountRequest {
+-}
+Index: src/main/java/requests/CreateUser.java
+===================================================================
+diff --git a/src/main/java/requests/CreateUser.java b/src/main/java/requests/CreateUser.java
+deleted file mode 100644
+--- a/src/main/java/requests/CreateUser.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,27 +0,0 @@
+-package requests;
+-
+-import io.restassured.response.ValidatableResponse;
+-import io.restassured.specification.RequestSpecification;
+-import io.restassured.specification.ResponseSpecification;
+-import models.CreateUserRequest;
+-
+-import static io.restassured.RestAssured.given;
+-
+-public class CreateUser extends PostRequest<CreateUserRequest> {
+-
+-    public CreateUser(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+-        super(requestSpecification, responseSpecification);
+-    }
+-
+-
+-    @Override
+-    public ValidatableResponse post(CreateUserRequest model) {
+-        return given()
+-                .spec(requestSpecification)
+-                .body(model)
+-                .post("/api/v1/admin/users")
+-                .then()
+-                .assertThat()
+-                .spec(responseSpecification);
+-    }
+-}
+Index: src/main/java/models/LoginUserResponse.java
+===================================================================
+diff --git a/src/main/java/models/LoginUserResponse.java b/src/main/java/models/LoginUserResponse.java
+deleted file mode 100644
+--- a/src/main/java/models/LoginUserResponse.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,14 +0,0 @@
+-package models;
+-import lombok.AllArgsConstructor;
+-import lombok.Builder;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-@Data
+-@NoArgsConstructor
+-@AllArgsConstructor
+-@Builder
+-public class LoginUserResponse extends BaseModel {
+-    private String username;
+-    private String role;
+-}
+Index: src/main/java/models/CreateAccountResponse.java
+===================================================================
+diff --git a/src/main/java/models/CreateAccountResponse.java b/src/main/java/models/CreateAccountResponse.java
+deleted file mode 100644
+--- a/src/main/java/models/CreateAccountResponse.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,4 +0,0 @@
+-package models;
+-
+-public class CreateAccountResponse extends BaseModel{
+-}
+Index: src/main/java/requests/PutRequest.java
+===================================================================
+diff --git a/src/main/java/requests/PutRequest.java b/src/main/java/requests/PutRequest.java
+deleted file mode 100644
+--- a/src/main/java/requests/PutRequest.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,18 +0,0 @@
+-package requests;
+-
+-import io.restassured.response.ValidatableResponse;
+-import io.restassured.specification.RequestSpecification;
+-import io.restassured.specification.ResponseSpecification;
+-import models.BaseModel;
+-
+-public abstract class PutRequest<T extends BaseModel> {
+-    protected RequestSpecification requestSpecification;// как отправлять
+-    protected ResponseSpecification responseSpecification;// что ожидать в ответ
+-
+-    public PutRequest(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+-        this.requestSpecification = requestSpecification;
+-        this.responseSpecification = responseSpecification;
+-    }
+-
+-    public abstract ValidatableResponse put(T model);
+-}
+Index: src/main/java/models/DepositAccountRequest.java
+===================================================================
+diff --git a/src/main/java/models/DepositAccountRequest.java b/src/main/java/models/DepositAccountRequest.java
+deleted file mode 100644
+--- a/src/main/java/models/DepositAccountRequest.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,15 +0,0 @@
+-package models;
+-
+-import lombok.AllArgsConstructor;
+-import lombok.Builder;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-@Data
+-@AllArgsConstructor
+-@NoArgsConstructor
+-@Builder
+-public class DepositAccountRequest <T extends Number> extends BaseModel{
+-    private long id;
+-    private T balance;
+-}
+Index: src/main/java/models/UpdateCustomerProfileResponse.java
+===================================================================
+diff --git a/src/main/java/models/UpdateCustomerProfileResponse.java b/src/main/java/models/UpdateCustomerProfileResponse.java
+deleted file mode 100644
+--- a/src/main/java/models/UpdateCustomerProfileResponse.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,22 +0,0 @@
+-package models;
+-
+-import lombok.AllArgsConstructor;
+-import lombok.Builder;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-import java.util.List;
+-
+-@Data
+-@AllArgsConstructor
+-@NoArgsConstructor
+-@Builder
+-public class UpdateCustomerProfileResponse extends BaseModel {
+-
+-    private long id;
+-    private String username;
+-    private String password;
+-    private String role;
+-    private List<String> accounts;
+-
+-}
+Index: src/main/java/spec/ResponseSpecs.java
+===================================================================
+diff --git a/src/main/java/spec/ResponseSpecs.java b/src/main/java/spec/ResponseSpecs.java
+deleted file mode 100644
+--- a/src/main/java/spec/ResponseSpecs.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,41 +0,0 @@
+-package spec;
+-
+-import io.restassured.builder.ResponseSpecBuilder;
+-import io.restassured.specification.ResponseSpecification;
+-import org.apache.http.HttpStatus;
+-
+-import static org.hamcrest.Matchers.equalTo;
+-
+-public class ResponseSpecs {
+-    private ResponseSpecs() {
+-    }
+-
+-    private static ResponseSpecBuilder defaultResponseBuilder() {
+-        return new ResponseSpecBuilder();
+-    }
+-
+-    public static ResponseSpecification entityWasCreated() {
+-        return defaultResponseBuilder()
+-                .expectStatusCode(HttpStatus.SC_CREATED)
+-                .build();
+-    }
+-
+-    public static ResponseSpecification requestReturnsOK() {
+-        return defaultResponseBuilder()
+-                .expectStatusCode(HttpStatus.SC_OK)
+-                .build();
+-    }
+-
+-    public static ResponseSpecification requestReturnOkAndCheckNewName(String newName) {
+-        return defaultResponseBuilder()
+-                .expectStatusCode(HttpStatus.SC_OK)
+-                .expectBody("customer.name", equalTo(newName))
+-                .build();
+-    }
+-
+-    public static ResponseSpecification requestReturnsBadRequest() {
+-        return ResponseSpecs.defaultResponseBuilder()
+-                .expectStatusCode(HttpStatus.SC_BAD_REQUEST)
+-                .build();
+-    }
+-}
+Index: src/main/java/requests/AdminLoginUserRequest.java
+===================================================================
+diff --git a/src/main/java/requests/AdminLoginUserRequest.java b/src/main/java/requests/AdminLoginUserRequest.java
+deleted file mode 100644
+--- a/src/main/java/requests/AdminLoginUserRequest.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,26 +0,0 @@
+-package requests;
+-
+-import io.restassured.response.ValidatableResponse;
+-import io.restassured.specification.RequestSpecification;
+-import io.restassured.specification.ResponseSpecification;
+-import models.LoginUserRequest;
+-
+-import static io.restassured.RestAssured.given;
+-
+-public class AdminLoginUserRequest extends PostRequest<LoginUserRequest> {
+-    public AdminLoginUserRequest(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+-        super(requestSpecification, responseSpecification);
+-    }
+-
+-    @Override
+-    public ValidatableResponse post(LoginUserRequest model) {
+-        return given()
+-                .spec(requestSpecification)
+-                .body(model)
+-                .post("/api/v1/auth/login")
+-                .then()
+-                .spec(responseSpecification);
+-    }
+-
+-
+-}
+Index: src/main/java/requests/UpdateCustomerProfile.java
+===================================================================
+diff --git a/src/main/java/requests/UpdateCustomerProfile.java b/src/main/java/requests/UpdateCustomerProfile.java
+deleted file mode 100644
+--- a/src/main/java/requests/UpdateCustomerProfile.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,45 +0,0 @@
+-package requests;
+-
+-import io.restassured.response.ValidatableResponse;
+-import io.restassured.specification.RequestSpecification;
+-import io.restassured.specification.ResponseSpecification;
+-import models.UpdateCustomerProfileRequest;
+-import spec.ResponseSpecs;
+-
+-import static io.restassured.RestAssured.given;
+-
+-public class UpdateCustomerProfile extends PutRequest<UpdateCustomerProfileRequest> {
+-
+-    // Конструктор без параметров для ResponseSpecification
+-    public UpdateCustomerProfile(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+-        super(requestSpecification, responseSpecification);
+-    }
+-
+-    // Конструктор С параметрами для динамических проверок
+-    public UpdateCustomerProfile(RequestSpecification requestSpec, String expectedName) {
+-        super(requestSpec, ResponseSpecs.requestReturnOkAndCheckNewName(expectedName));
+-    }
+-
+-    // Реализация PUT (основной метод для обновления профиля)
+-    @Override
+-    public ValidatableResponse put(UpdateCustomerProfileRequest model) {
+-        return given()
+-                .spec(requestSpecification)
+-                .body(model)
+-                .put("/api/v1/customer/profile")  // PUT запрос
+-                .then()
+-                .spec(responseSpecification);
+-    }
+-
+-    // Дополнительный метод PUT с кастомной проверкой
+-    public ValidatableResponse put(UpdateCustomerProfileRequest model, String expectedName) {
+-        return given()
+-                .spec(requestSpecification)
+-                .body(model)
+-                .put("/api/v1/customer/profile")
+-                .then()
+-                .spec(ResponseSpecs.requestReturnOkAndCheckNewName(expectedName));
+-    }
+-
+-
+-}
+Index: src/main/java/models/Transaction.java
+===================================================================
+diff --git a/src/main/java/models/Transaction.java b/src/main/java/models/Transaction.java
+deleted file mode 100644
+--- a/src/main/java/models/Transaction.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,4 +0,0 @@
+-package models;
+-
+-public class Transaction {
+-}
+Index: src/main/java/requests/UserDepositAccount.java
+===================================================================
+diff --git a/src/main/java/requests/UserDepositAccount.java b/src/main/java/requests/UserDepositAccount.java
+deleted file mode 100644
+--- a/src/main/java/requests/UserDepositAccount.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,25 +0,0 @@
+-package requests;
+-
+-import io.restassured.response.ValidatableResponse;
+-import io.restassured.specification.RequestSpecification;
+-import io.restassured.specification.ResponseSpecification;
+-import models.DepositAccountRequest;
+-
+-import static io.restassured.RestAssured.given;
+-
+-public class UserDepositAccount extends PostRequest<DepositAccountRequest<Double>> {
+-    public UserDepositAccount(RequestSpecification requestSpecification, ResponseSpecification responseSpecification) {
+-        super(requestSpecification, responseSpecification);
+-    }
+-
+-    @Override
+-    public ValidatableResponse post(DepositAccountRequest<Double> model) {
+-    return given()
+-            .spec(requestSpecification)
+-            .body(model)
+-            .post("/api/v1/accounts/deposit")
+-            .then()
+-            .assertThat()
+-            .spec(responseSpecification);
+-}
+-}
+Index: src/main/java/models/LoginUserRequest.java
+===================================================================
+diff --git a/src/main/java/models/LoginUserRequest.java b/src/main/java/models/LoginUserRequest.java
+deleted file mode 100644
+--- a/src/main/java/models/LoginUserRequest.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,14 +0,0 @@
+-package models;
+-import lombok.AllArgsConstructor;
+-import lombok.Builder;
+-import lombok.Data;
+-import lombok.NoArgsConstructor;
+-
+-@Data
+-@NoArgsConstructor
+-@AllArgsConstructor
+-@Builder
+-public class LoginUserRequest extends BaseModel{
+-    private String username;
+-    private String password;
+-}
+Index: src/main/java/models/BaseModel.java
+===================================================================
+diff --git a/src/main/java/models/BaseModel.java b/src/main/java/models/BaseModel.java
+deleted file mode 100644
+--- a/src/main/java/models/BaseModel.java	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
++++ /dev/null	(revision 8aa6ee98b5f1ab1ec0abccf7456e7d0c10382bd2)
+@@ -1,4 +0,0 @@
+-package models;
+-
+-public abstract class BaseModel {
+-}

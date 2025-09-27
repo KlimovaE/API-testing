@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="083be415-7ece-4e4b-a9f1-393f411416de" name="Changes" comment="&quot;Transfer to new branch&quot;" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <excluded-from-favorite>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="master" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </excluded-from-favorite>
+    <favorite-branches>
+      <branch-storage>
+        <map>
+          <entry type="LOCAL">
+            <value>
+              <list>
+                <branch-info repo="$PROJECT_DIR$" source="APItestMiddle" />
+              </list>
+            </value>
+          </entry>
+        </map>
+      </branch-storage>
+    </favorite-branches>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="APItestsMiddle" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;KlimovaE&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/KlimovaE/API-testing&quot;,
+    &quot;accountId&quot;: &quot;9450856f-2d71-4869-8b4a-88d072bb3824&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$MAVEN_REPOSITORY$/io/rest-assured/rest-assured/5.5.5/rest-assured-5.5.5.jar!/io/restassured/response/ValidatableResponse.class" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="326ydYza7eUeXaZiiP8TnxDcucj" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "HTTP Request.All in iteration_2.executor": "Run",
+    "HTTP Request.iteration_1 | AdminToken: Authorization: Basic YWRtaW46YWRtaW4=.executor": "Run",
+    "HTTP Request.iteration_1 | Get allUsers.executor": "Run",
+    "HTTP Request.iteration_1 | Negative test: Create user that already exist by admin#1.executor": "Run",
+    "HTTP Request.iteration_1 | Negative test: Update user's name - with duplicate name.executor": "Run",
+    "HTTP Request.iteration_1 | Positive test: Get auth token.executor": "Run",
+    "HTTP Request.iteration_2 | #1.executor": "Run",
+    "HTTP Request.iteration_2 | #2.executor": "Run",
+    "HTTP Request.iteration_2 | #3.executor": "Run",
+    "HTTP Request.iteration_2 | Corner test: Update user's name - all symbols are numbers#2.executor": "Run",
+    "HTTP Request.iteration_2 | Corner test: Update user's name - all symbols are numbers.executor": "Run",
+    "HTTP Request.iteration_2 | Corner test: Update user's name - all symbols are special symbols.executor": "Run",
+    "HTTP Request.iteration_2 | Corner test: make a deposit with 0.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: Update user's name - all symbols are numbers.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: Update user's name - with \".executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: Update user's name - with +.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: Update user's name - with :#2.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: Update user's name - with \\#2.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: Update user's name - with duplicate name.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: Update user's name to empty.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: Update user's name to only spases.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a deposit to not exist account#1.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a deposit to not exist account#2.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a deposit to not exist account.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a negative deposit to empty account.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a negative deposit.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a negative transfer.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a transfer from not exist account.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a transfer from-to one account.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a transfer more than balance.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a transfer to not exist account.executor": "Run",
+    "HTTP Request.iteration_2 | Negative test: make a transfer with zero.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Create user's account.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name - 14 symbols.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name - 15 symbols.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name - 3 symbols.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name - 4 symbols.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name - all valid special symbols.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name - use all type symbols.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name to another valid name.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name to duplicate another user's name.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: Update user's name to duplicate name.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: make a deposit to not empty account.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: make a deposit with non-integer number.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: make a transfer all balance.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: make a transfer to another user.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: make a transfer with min amount.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: make transfer to another user.executor": "Run",
+    "HTTP Request.iteration_2 | Positive test: make transfer with min amount.executor": "Run",
+    "HTTP Request.iteration_2 | User1Token: Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh.executor": "Run",
+    "HTTP Request.iteration_2 | UserToken: Authorization: Basic YWRtaW46YWRtaW4=.executor": "Run",
+    "HTTP Request.iteration_2 | UserToken: Authorization: Basic a2F0ZTIwMjU6S2F0ZTIwMjUh.executor": "Run",
+    "HTTP Request.iteration_2 | Тестирование депозита.executor": "Run",
+    "HTTP Request.iteration_2 | Тестирование транзакций#1.executor": "Run",
+    "HTTP Request.iteration_2 | Тестирование транзакций#2.executor": "Run",
+    "HTTP Request.iteration_2 | Тестирование транзакций.executor": "Run",
+    "HTTP Request.precondition | Create first account for user1.executor": "Run",
+    "HTTP Request.precondition | Create first account for user2.executor": "Run",
+    "HTTP Request.precondition | Create first new user.executor": "Run",
+    "HTTP Request.precondition | Create second account for user1.executor": "Run",
+    "HTTP Request.precondition | Create second new user.executor": "Run",
+    "HTTP Request.precondition | Get admin auth token.executor": "Run",
+    "HTTP Request.precondition | Get all users by admin.executor": "Run",
+    "HTTP Request.precondition | Get user1 auth token.executor": "Run",
+    "HTTP Request.precondition | Get user1's acounts.executor": "Run",
+    "HTTP Request.precondition | Get user2 auth token.executor": "Run",
+    "HTTP Request.precondition | Get user2's acounts.executor": "Run",
+    "HTTP Request.precondition | Positive test: Get user2 auth token.executor": "Run",
+    "JUnit.DepositAccount.executor": "Run",
+    "JUnit.DepositAccount.userCanDepositAccountTest (1).executor": "Run",
+    "JUnit.DepositAccount.userCanDepositAccountTest (2).executor": "Run",
+    "JUnit.DepositAccount.userCanDepositAccountTest (3).executor": "Run",
+    "JUnit.DepositAccount.userCanDepositAccountTest.executor": "Run",
+    "JUnit.DepositAccount.userCannotDepositAccountTest.executor": "Run",
+    "JUnit.DepositAccount.userCannotDepositNotExistAccount.executor": "Run",
+    "JUnit.DepositAccount.userCannotDepositNotExistAccountTest (1).executor": "Run",
+    "JUnit.DepositAccount.userCannotDepositNotExistAccountTest.executor": "Run",
+    "JUnit.TransferToAccount.executor": "Run",
+    "JUnit.TransferToAccount.userCanTransitTest.executor": "Run",
+    "JUnit.TransferToAccount.userCannotTransferTest.executor": "Run",
+    "JUnit.TransferToAccount.userCannotTransitInvalidAmountTest.executor": "Run",
+    "JUnit.UpdateUserName.executor": "Run",
+    "JUnit.UpdateUserName.useOnlySpecialSymbolsOrNumbersForNameTest.executor": "Run",
+    "JUnit.UpdateUserName.userCanUpdateNameTest.executor": "Run",
+    "JUnit.UpdateUserName.userCanUpdateNameToNameAnotherUserTest.executor": "Run",
+    "JUnit.UpdateUserName.userCanUpdateNullName.executor": "Run",
+    "JUnit.UpdateUserName.userCannotUpdateNameWithInvalidValue.executor": "Run",
+    "JUnit.iteration_2 in nbank-tests.executor": "Run",
+    "Maven.nbank-tests [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/lekka/Documents/projects/nbank-tests",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+  </component>
+  <component name="RunManager" selected="HTTP Request.iteration_2 | Negative test: make a deposit to not exist account#2">
+    <configuration name="iteration_2 | Negative test: make a deposit to not exist account#1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/requests/iteration_2.http" executionIdentifier="Negative test: make a deposit to not exist account#1" index="14" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="iteration_2 | Negative test: make a deposit to not exist account#2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/requests/iteration_2.http" executionIdentifier="Negative test: make a deposit to not exist account#2" index="15" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="iteration_2 | Negative test: make a transfer from-to one account" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/requests/iteration_2.http" executionIdentifier="Negative test: make a transfer from-to one account" index="27" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="iteration_2 | Positive test: make a transfer all balance" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/requests/iteration_2.http" executionIdentifier="Positive test: make a transfer all balance" index="21" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="precondition | Get all users by admin" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/requests/precondition.http" executionIdentifier="Get all users by admin" index="11" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="nbank-tests" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="nbank-tests" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <module name="nbank-tests" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="Tox" factoryName="Tox">
+      <module name="nbank-tests" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.precondition | Get all users by admin" />
+        <item itemvalue="HTTP Request.iteration_2 | Positive test: make a transfer all balance" />
+        <item itemvalue="HTTP Request.iteration_2 | Negative test: make a transfer from-to one account" />
+        <item itemvalue="HTTP Request.iteration_2 | Negative test: make a deposit to not exist account#2" />
+        <item itemvalue="HTTP Request.iteration_2 | Negative test: make a deposit to not exist account#1" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="083be415-7ece-4e4b-a9f1-393f411416de" name="Changes" comment="" />
+      <created>1756755407485</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1756755407485</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Initial commit. Project setup">
+      <option name="closed" value="true" />
+      <created>1756980104336</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1756980104336</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Added API tests(junior)">
+      <option name="closed" value="true" />
+      <created>1757331716100</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1757331716100</updated>
+    </task>
+    <task id="LOCAL-00003" summary="&quot;Initialize APItestMiddle branch&quot;">
+      <option name="closed" value="true" />
+      <created>1757510300432</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1757510300432</updated>
+    </task>
+    <task id="LOCAL-00004" summary="&quot;Transfer to new branch&quot;">
+      <option name="closed" value="true" />
+      <created>1757587400396</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1757587400396</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="APItestJunior" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial commit. Project setup" />
+    <MESSAGE value="Added API tests(junior)" />
+    <MESSAGE value="&quot;Initialize APItestMiddle branch&quot;" />
+    <MESSAGE value="&quot;Transfer to new branch&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;Transfer to new branch&quot;" />
+  </component>
+</project>
