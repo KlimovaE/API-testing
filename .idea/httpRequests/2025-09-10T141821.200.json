@@ -1,0 +1,11 @@
+{
+  "customer": {
+    "id": 15,
+    "username": "kate2025",
+    "password": "$2a$10$19ql5kQUQe3s./NjuS1ecOORWAxIXezRVVjyn7IPI6Ojp5D6fE.0a",
+    "name": "1234567890",
+    "role": "USER",
+    "accounts": []
+  },
+  "message": "Profile updated successfully"
+}
