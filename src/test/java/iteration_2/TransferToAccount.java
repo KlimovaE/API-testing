@@ -155,7 +155,7 @@ public class TransferToAccount extends BaseTest {
         double actualReceiverBalance = getActualBalance.getActualAccountBalance(user1Token, secondAccountUser1);
 
         //Проверка, что баланс отправителя уменьшился
-        softly.assertThat(actualSenderBalance).isEqualTo(balanceAfterDeposit, within(0.01));
+        softly.assertThat(actualSenderBalance).isEqualTo(balanceAfterDeposit- transferAmount, within(0.01));
         //Проверка, что баланс получателя пополнился
         softly.assertThat(actualReceiverBalance).isEqualTo(transferAmount, within(0.01));
     }
