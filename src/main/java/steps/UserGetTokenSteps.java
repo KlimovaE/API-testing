@@ -3,8 +3,8 @@ package steps;
 //Фасадный Step для удобного получения токена. Объединяет создание пользователя и логин под капотом
 
 import generators.RandomData;
-import models.requsts.CreateUserRequest;
 import models.Role;
+import models.requsts.CreateUserRequest;
 
 public class UserGetTokenSteps {
     private final UserCreationSteps creationSteps = new UserCreationSteps();

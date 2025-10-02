@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import requests.DepositAccountRequester;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
+import requests.skelethon.requests.ValidatedCrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 import steps.AccountCreationSteps;
@@ -73,9 +75,13 @@ public class DepositAccount {
                 .balance(depositAmount)
                 .build();
 
-        double actualBalance = new DepositAccountRequester(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
-                .post(depositAccount)
-                .extract().as(DepositAccountResponse.class).getBalance();
+        DepositAccountResponse response = (DepositAccountResponse) new ValidatedCrudRequester<DepositAccountResponse>(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.DEPOSIT,
+                ResponseSpecs.requestReturnsOK())
+                .post(depositAccount);
+
+        double actualBalance = response.getBalance();
 
         //Проверяем баланс после пополнения
         assertEquals(depositAmount, actualBalance, 0.001, "Баланс должен быть равен сумме пополнения");
@@ -93,9 +99,13 @@ public class DepositAccount {
                 .balance(depositAmount)
                 .build();
 
-        double actualBalance = new DepositAccountRequester(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
-                .post(depositAccount)
-                .extract().as(DepositAccountResponse.class).getBalance();
+        DepositAccountResponse response = (DepositAccountResponse) new ValidatedCrudRequester<DepositAccountResponse>(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.DEPOSIT,
+                ResponseSpecs.requestReturnsOK())
+                .post(depositAccount);
+
+        double actualBalance = response.getBalance();
 
         //Проверяем баланс после пополнения
         assertEquals(DEPOSIT_AMOUNT + depositAmount, actualBalance, 0.001, "Баланс должен увеличиться на сумму пополнения");
@@ -111,7 +121,10 @@ public class DepositAccount {
                 .balance(depositAmount)
                 .build();
 
-        new DepositAccountRequester(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsBadRequest())
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.DEPOSIT,
+                ResponseSpecs.requestReturnsBadRequest())
                 .post(depositAccount);
 
         //Получаем баланс и проверяем, что он не изменился
@@ -122,6 +135,7 @@ public class DepositAccount {
     @Test
     @DisplayName("Ошибка: Пользователь не может пополнить чужой счет")
     public void userCannotDepositSomebodyAccountTest() {
+
         //1. Создаем счет другого пользователя
         long firstAccountUser2 = accountSteps.createAccount(userGetTokenSteps.createRandomUserAndGetToken()).getId();
         // 2. Пополняем чужой счет
@@ -130,7 +144,10 @@ public class DepositAccount {
                 .balance(DEPOSIT_AMOUNT)
                 .build();
 
-        new DepositAccountRequester(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsForbidden())
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.DEPOSIT,
+                ResponseSpecs.requestReturnsForbidden())
                 .post(depositAccount);//под капотом проверка, что пришел код ответа 403
     }
 
@@ -145,7 +162,10 @@ public class DepositAccount {
                 .balance(DEPOSIT_AMOUNT)
                 .build();
 
-        new DepositAccountRequester(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsForbidden())
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.DEPOSIT,
+                ResponseSpecs.requestReturnsForbidden())
                 .post(depositAccount);//под капотом проверка, что пришел код ответа 403
     }
 }

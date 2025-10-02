@@ -1,14 +1,19 @@
 package steps;
 
 import models.response.CreateAccountResponse;
-import requests.CreateAccount;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class AccountCreationSteps {
-    public CreateAccountResponse createAccount(String userToken) {
-        return new CreateAccount(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.entityWasCreated())
-                .post()
-                .extract().as(CreateAccountResponse.class);
+    public static CreateAccountResponse createAccount(String userToken) {
+        return new CrudRequester(
+                RequestSpecs.userAuthSpec(userToken),
+                Endpoint.ACCOUNTS,
+                ResponseSpecs.entityWasCreated())
+                .post(null)
+                .extract()
+                .as(CreateAccountResponse.class);
     }
 }

@@ -1,20 +1,24 @@
 package steps;
 
-import io.restassured.response.Response;
 import models.requsts.DepositAccountRequest;
-import requests.DepositAccountRequester;
+import models.response.DepositAccountResponse;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class DepositSteps {
-    public Response depositAccount(long accountId, double depositAmount, String userToken) {
+    public DepositAccountResponse depositAccount(long accountId, double depositAmount, String userToken) {
         DepositAccountRequest depositUserAccount = DepositAccountRequest.builder()
                 .id(accountId)
                 .balance(depositAmount)
                 .build();
-        return new DepositAccountRequester(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
+        return new CrudRequester(
+                RequestSpecs.userAuthSpec(userToken),
+                Endpoint.DEPOSIT,
+                ResponseSpecs.requestReturnsOK())
                 .post(depositUserAccount)
                 .extract()
-                .response();
+                .as(DepositAccountResponse.class);
     }
 }

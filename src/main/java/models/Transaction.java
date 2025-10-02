@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @Getter
 
-public class Transaction {
+public class Transaction extends BaseModel {
     private long id;
     private double amount;
     private String type;

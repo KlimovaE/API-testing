@@ -1,15 +1,16 @@
 package models.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import models.BaseModel;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateUserResponse {
+@Builder
+@Getter
+public class CreateUserResponse extends BaseModel {
         private long id;
         private String username;
         private String password;

@@ -2,7 +2,8 @@ package steps;
 
 import models.requsts.UpdateCustomerProfileRequest;
 import models.response.UpdateCustomerProfileResponse;
-import requests.UpdateCustomerProfile;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
@@ -13,7 +14,10 @@ public class UpdateProfileSteps {
                 .name(newName)
                 .build();
 
-        return new UpdateCustomerProfile(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
+        return new CrudRequester(
+                RequestSpecs.userAuthSpec(userToken),
+                Endpoint.UPDATE_CUSTOMER,
+                ResponseSpecs.requestReturnsOK())
                 .put(updateRequest)
                 .extract().as(UpdateCustomerProfileResponse.class);
     }

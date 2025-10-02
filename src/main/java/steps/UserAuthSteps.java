@@ -1,7 +1,8 @@
 package steps;
 
 import models.requsts.LoginUserRequest;
-import requests.AdminLoginUserRequest;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
@@ -12,7 +13,10 @@ public class UserAuthSteps {
                 .password(password)
                 .build();
 
-        return new AdminLoginUserRequest(RequestSpecs.unAuthSpec(), ResponseSpecs.requestReturnsOK())
+        return new CrudRequester(
+                RequestSpecs.unAuthSpec(),
+                Endpoint.LOGIN,
+                ResponseSpecs.requestReturnsOK())
                 .post(loginRequest)
                 .extract()
                 .header("Authorization");

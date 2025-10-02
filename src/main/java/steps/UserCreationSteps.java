@@ -1,21 +1,22 @@
 package steps;
 
-import generators.RandomData;
-import models.requsts.CreateUserRequest;
+import generators.RandomModelGenerator;
 import models.Role;
-import requests.CreateUser;
+import models.requsts.CreateUserRequest;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class UserCreationSteps {
     public CreateUserRequest createUser(String username, String password, Role role) {
-        CreateUserRequest createUserRequest = CreateUserRequest.builder()
-                .username(RandomData.getUserName())
-                .password(RandomData.getPassword())
-                .role(role.toString()) // Берем из enum
-                .build();
+        CreateUserRequest createUserRequest =
+                RandomModelGenerator.generate(CreateUserRequest.class);
 
-        new CreateUser(RequestSpecs.adminAuthSpec(), ResponseSpecs.entityWasCreated())
+        new CrudRequester(
+                RequestSpecs.adminAuthSpec(),
+                Endpoint.ADMIN_CREATE_USER,
+                ResponseSpecs.entityWasCreated())
                 .post(createUserRequest);
 
         return createUserRequest;

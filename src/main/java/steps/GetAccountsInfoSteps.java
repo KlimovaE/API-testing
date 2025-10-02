@@ -1,13 +1,17 @@
 package steps;
 
 import models.Account;
-import requests.GetAccountInfoRequest;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class GetAccountsInfoSteps {
     public Account[]  getAccountsInfo(String userToken) {
-        return new GetAccountInfoRequest(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
+        return new CrudRequester(
+                RequestSpecs.userAuthSpec(userToken),
+                Endpoint.ACCOUNTS_INFO,
+                ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract()
                 .as(Account[].class);

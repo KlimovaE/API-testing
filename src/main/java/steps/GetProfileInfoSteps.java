@@ -1,13 +1,17 @@
 package steps;
 
 import models.response.GetCustomerProfileResponse;
-import requests.GetCustomerProfileRequest;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class GetProfileInfoSteps {
     public GetCustomerProfileResponse getProfileInfo(String userToken){
-        return new GetCustomerProfileRequest(RequestSpecs.userAuthSpec(userToken), ResponseSpecs.requestReturnsOK())
+        return new CrudRequester(
+                RequestSpecs.userAuthSpec(userToken),
+                Endpoint.GET_CUSTOMER_INFO,
+                ResponseSpecs.requestReturnsOK())
                 .get()
                 .extract().as(GetCustomerProfileResponse.class);
     }

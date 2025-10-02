@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import requests.TransferToAccountRequest;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.CrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 import steps.AccountCreationSteps;
@@ -95,15 +96,18 @@ public class TransferToAccount extends BaseTest {
                 .amount(transferAmount)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
+                ResponseSpecs.requestReturnsOK())
                 .post(request);
 
+        //Получаем баланс отправителя и получателя после перевода
         double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
         double actualReceiverBalance = getActualBalance.getActualAccountBalance(user1Token, secondAccountUser1);
 
         //Проверка, что баланс отправителя уменьшился
         softly.assertThat(actualSenderBalance).isEqualTo(INITIAL_BALANCE-transferAmount, within(0.01));
-        assertEquals(INITIAL_BALANCE-transferAmount, actualSenderBalance, 0.01);
         //Проверка, что баланс получателя пополнился
         softly.assertThat(actualReceiverBalance).isEqualTo(transferAmount, within(0.01));
         }
@@ -120,9 +124,13 @@ public class TransferToAccount extends BaseTest {
                 .amount(TRANSFER_AMOUNT)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
+                ResponseSpecs.requestReturnsOK())
                 .post(request);
 
+        //Получаем баланс отправителя и получателя после перевода
         double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
         double actualReceiverBalance = getActualBalance.getActualAccountBalance(user1Token, secondAccountUser1);
 
@@ -139,7 +147,7 @@ public class TransferToAccount extends BaseTest {
         // 1. Дополнительное пополнение счета отправителя для суммы баланса больше 10000
         depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
         depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
-        double balanceAfterDeposit = INITIAL_BALANCE*3;// счет пополнили 3 раза до нужной суммы
+        double senderSAccountBalanceAfterDeposit = INITIAL_BALANCE*3;// счет пополнили 3 раза до нужной суммы
 
 
         TransferAccountRequest request = TransferAccountRequest.builder()
@@ -148,14 +156,18 @@ public class TransferToAccount extends BaseTest {
                 .amount(transferAmount)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
+                ResponseSpecs.requestReturnsOK())
                 .post(request);
 
+        //Получаем баланс отправителя и получателя после перевода
         double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
         double actualReceiverBalance = getActualBalance.getActualAccountBalance(user1Token, secondAccountUser1);
 
         //Проверка, что баланс отправителя уменьшился
-        softly.assertThat(actualSenderBalance).isEqualTo(balanceAfterDeposit- transferAmount, within(0.01));
+        softly.assertThat(actualSenderBalance).isEqualTo(senderSAccountBalanceAfterDeposit- transferAmount, within(0.01));
         //Проверка, что баланс получателя пополнился
         softly.assertThat(actualReceiverBalance).isEqualTo(transferAmount, within(0.01));
     }
@@ -169,9 +181,13 @@ public class TransferToAccount extends BaseTest {
                 .amount(TRANSFER_AMOUNT)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
+                ResponseSpecs.requestReturnsOK())
                 .post(request);
 
+        //Получаем баланс отправителя и получателя после перевода
         double actualSenderBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
         double actualReceiverBalance = getActualBalance.getActualAccountBalance(user2Token, firstAccountUser2);
 
@@ -193,8 +209,10 @@ public class TransferToAccount extends BaseTest {
                 .amount(transferAmount)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
-                ResponseSpecs.requestReturnsBadRequest())
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
+                ResponseSpecs.requestReturnsOK())
                 .post(request);
 
         //Проверка, что баланс отправителя не изменился
@@ -212,7 +230,9 @@ public class TransferToAccount extends BaseTest {
                 .amount(transferAmount)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
                 ResponseSpecs.requestReturnsBadRequest())
                 .post(request);
 
@@ -229,22 +249,25 @@ public class TransferToAccount extends BaseTest {
                 .amount(TRANSFER_AMOUNT)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
                 ResponseSpecs.requestReturnsForbidden())
-                .post(request);
+                .post(request);//под капотом проверка, что пришел код ответа 403
     }
 
     @Test
     @DisplayName("Ошибка: перевод на несуществующий счет")
     public void cannotTransferToNonExistentAccount() {
-        depositSteps.depositAccount(firstAccountUser1, INITIAL_BALANCE, user1Token);
         TransferAccountRequest request = TransferAccountRequest.builder()
                 .senderAccountId(firstAccountUser1)
                 .receiverAccountId(randomNonExistentId)
                 .amount(TRANSFER_AMOUNT)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
                 ResponseSpecs.requestReturnsBadRequest())
                 .post(request);
 
@@ -262,9 +285,11 @@ public class TransferToAccount extends BaseTest {
                 .amount(TRANSFER_AMOUNT)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
                 ResponseSpecs.requestReturnsForbidden())
-                .post(request);
+                .post(request);//под капотом проверка, что пришел код ответа 403
     }
 
     @Test
@@ -276,7 +301,9 @@ public class TransferToAccount extends BaseTest {
                 .amount(TRANSFER_AMOUNT)
                 .build();
 
-        new TransferToAccountRequest(RequestSpecs.userAuthSpec(user1Token),
+        new CrudRequester(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.TRANSFER,
                 ResponseSpecs.requestReturnsBadRequest())
                 .post(request);
 

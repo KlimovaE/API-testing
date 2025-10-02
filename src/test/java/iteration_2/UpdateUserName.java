@@ -1,7 +1,6 @@
 package iteration_2;
 
 import models.requsts.UpdateCustomerProfileRequest;
-import models.response.GetCustomerProfileResponse;
 import models.response.UpdateCustomerProfileResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import requests.GetCustomerProfileRequest;
-import requests.UpdateCustomerProfile;
+import requests.skelethon.Endpoint;
+import requests.skelethon.requests.ValidatedCrudRequester;
 import spec.RequestSpecs;
 import spec.ResponseSpecs;
 import steps.UpdateProfileSteps;
@@ -70,9 +69,13 @@ public class UpdateUserName {
                 .name(NEW_NAME)
                 .build();
 
-        String actualName = new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
-                .put(updateRequest)
-                .extract().as(UpdateCustomerProfileResponse.class).getCustomer().getName();
+         UpdateCustomerProfileResponse response = (UpdateCustomerProfileResponse) new ValidatedCrudRequester<UpdateCustomerProfileResponse>(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.UPDATE_CUSTOMER,
+                ResponseSpecs.requestReturnsOK())
+                .put(updateRequest);
+
+        String actualName = response.getCustomer().getName();
 
         //Проверяем что у имени теперь новое значение
         assertEquals(NEW_NAME, actualName);
@@ -90,10 +93,13 @@ public class UpdateUserName {
                 .name(newName)
                 .build();
 
-        String actualName = new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
-                .put(updateRequest)
-                .extract().as(UpdateCustomerProfileResponse.class).getCustomer().getName();
+        UpdateCustomerProfileResponse response = (UpdateCustomerProfileResponse) new ValidatedCrudRequester<UpdateCustomerProfileResponse>(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.UPDATE_CUSTOMER,
+                ResponseSpecs.requestReturnsOK())
+                .put(updateRequest);
 
+        String actualName = response.getCustomer().getName();
         //Проверяем что у имени теперь новое значение
         assertEquals(newName, actualName);
     }
@@ -111,9 +117,13 @@ public class UpdateUserName {
                 .name(NEW_NAME)
                 .build();
 
-        String actualName = new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user2Token), ResponseSpecs.requestReturnsOK())
-                .put(updateRequest)
-                .extract().as(UpdateCustomerProfileResponse.class).getCustomer().getName();
+        UpdateCustomerProfileResponse response = (UpdateCustomerProfileResponse) new ValidatedCrudRequester<UpdateCustomerProfileResponse>(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.UPDATE_CUSTOMER,
+                ResponseSpecs.requestReturnsOK())
+                .put(updateRequest);
+
+        String actualName = response.getCustomer().getName();
 
         //Проверяем что у имени теперь новое значение
         assertEquals(NEW_NAME, actualName);
@@ -128,9 +138,13 @@ public class UpdateUserName {
                 .name(newName)
                 .build();
 
-        String actualName = new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
-                .put(updateRequest)
-                .extract().as(UpdateCustomerProfileResponse.class).getCustomer().getName();
+        UpdateCustomerProfileResponse response = (UpdateCustomerProfileResponse) new ValidatedCrudRequester<UpdateCustomerProfileResponse>(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.UPDATE_CUSTOMER,
+                ResponseSpecs.requestReturnsOK())
+                .put(updateRequest);
+
+        String actualName = response.getCustomer().getName();
 
         //Проверяем что у имени теперь новое значение
         assertEquals(newName, actualName);
@@ -144,15 +158,14 @@ public class UpdateUserName {
                 .name(invalidName)
                 .build();
 
-        new UpdateCustomerProfile(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsBadRequest())
+        UpdateCustomerProfileResponse response = (UpdateCustomerProfileResponse) new ValidatedCrudRequester<UpdateCustomerProfileResponse>(
+                RequestSpecs.userAuthSpec(user1Token),
+                Endpoint.UPDATE_CUSTOMER,
+                ResponseSpecs.requestReturnsBadRequest())
                 .put(updateRequest);
 
+        String actualName = response.getCustomer().getName();
         //Проверяем, что имя не изменилось
-
-        String actualName = new GetCustomerProfileRequest(RequestSpecs.userAuthSpec(user1Token), ResponseSpecs.requestReturnsOK())
-                .get()
-                .extract().as(GetCustomerProfileResponse.class).getName();
-
         assertNull(actualName, "Дефолтное значение поля name не изменилось и осталось null");
     }
 }
