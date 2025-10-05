@@ -7,7 +7,7 @@ import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class UserAuthSteps {
-    public String loginUser(String username, String password) {
+    public static String loginUser(String username, String password) {
         LoginUserRequest loginRequest = LoginUserRequest.builder()
                 .username(username)
                 .password(password)

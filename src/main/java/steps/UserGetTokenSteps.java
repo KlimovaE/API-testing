@@ -7,14 +7,11 @@ import models.Role;
 import models.requsts.CreateUserRequest;
 
 public class UserGetTokenSteps {
-    private final UserCreationSteps creationSteps = new UserCreationSteps();
-    private final UserAuthSteps authSteps = new UserAuthSteps();
-
-    public String createRandomUserAndGetToken() {
+    public static String createRandomUserAndGetToken() {
         // 1. Создаем случайного пользователя
-        CreateUserRequest createUserRequest = creationSteps.createUser(RandomData.getUserName(), RandomData.getPassword(), Role.USER);
+        CreateUserRequest createUserRequest = UserCreationSteps.createUser(RandomData.getUserName(), RandomData.getPassword(), Role.USER);
 
         // 2. Логинимся и возвращаем токен
-        return authSteps.loginUser(createUserRequest.getUsername(), createUserRequest.getPassword());
+        return UserAuthSteps.loginUser(createUserRequest.getUsername(), createUserRequest.getPassword());
     }
 }

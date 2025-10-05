@@ -24,10 +24,6 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DepositAccountTest {
-    private final UserGetTokenSteps userGetTokenSteps = new UserGetTokenSteps();
-    private final AccountCreationSteps accountSteps = new AccountCreationSteps();
-    private final DepositSteps depositSteps = new DepositSteps();
-    private final GetActualBalanceSteps getActualBalance = new GetActualBalanceSteps();
     private final double DEPOSIT_AMOUNT = 100.00;
     private final double INITIAL_BALANCE = 0.00;
     private String user1Token;
@@ -37,9 +33,9 @@ public class DepositAccountTest {
     @BeforeEach
     public void setupTestData() {
         //Получение токена для пользователя1
-        user1Token = userGetTokenSteps.createRandomUserAndGetToken();
+        user1Token = UserGetTokenSteps.createRandomUserAndGetToken();
         //Создание счета для пользователя1
-        firstAccountUser1 = accountSteps.createAccount(user1Token).getId();
+        firstAccountUser1 = AccountCreationSteps.createAccount(user1Token).getId();
     }
 
     public static Stream<Arguments> depositAccountPositiveCases() {
@@ -92,7 +88,7 @@ public class DepositAccountTest {
     @MethodSource("depositAccountPositiveCases")
     public void userCanDepositAccountTest(double depositAmount) {
         // 1. Устанавливаем начальный баланс
-        depositSteps.depositAccount(firstAccountUser1, DEPOSIT_AMOUNT, user1Token);
+        DepositSteps.depositAccount(firstAccountUser1, DEPOSIT_AMOUNT, user1Token);
         // 2. Делаем депозит и получаем актуальный баланс
         DepositAccountRequest depositAccount = DepositAccountRequest.builder()
                 .id(firstAccountUser1)
@@ -128,7 +124,7 @@ public class DepositAccountTest {
                 .post(depositAccount);
 
         //Получаем баланс и проверяем, что он не изменился
-        double actualBalance = getActualBalance.getActualAccountBalance(user1Token, firstAccountUser1);
+        double actualBalance = GetActualBalanceSteps.getActualAccountBalance(user1Token, firstAccountUser1);
         assertEquals(INITIAL_BALANCE, actualBalance, 0.01, "Баланс не должен был измениться");
     }
 
@@ -137,7 +133,7 @@ public class DepositAccountTest {
     public void userCannotDepositSomebodyAccountTest() {
 
         //1. Создаем счет другого пользователя
-        long firstAccountUser2 = accountSteps.createAccount(userGetTokenSteps.createRandomUserAndGetToken()).getId();
+        long firstAccountUser2 = AccountCreationSteps.createAccount(UserGetTokenSteps.createRandomUserAndGetToken()).getId();
         // 2. Пополняем чужой счет
         DepositAccountRequest depositAccount = DepositAccountRequest.builder()
                 .id(firstAccountUser2)

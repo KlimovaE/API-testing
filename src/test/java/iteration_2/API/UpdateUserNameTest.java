@@ -22,15 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 public class UpdateUserNameTest {
-    private final UserGetTokenSteps userGetTokenSteps = new UserGetTokenSteps();
-    private final UpdateProfileSteps updateProfileSteps = new UpdateProfileSteps();
     private String user1Token;
     private final String NEW_NAME = "Kate";
 
     @BeforeEach
     public void setUp() {
         // Создаем пользователя перед каждым тестом
-        user1Token = userGetTokenSteps.createRandomUserAndGetToken();
+        user1Token = UserGetTokenSteps.createRandomUserAndGetToken();
     }
 
     public static Stream<Arguments> validNameData() {
@@ -86,7 +84,7 @@ public class UpdateUserNameTest {
     @DisplayName("Пользователь может изменить имя с null и с другого значения")
     public void userCanUpdateNameToAnotherValidNameTest(String initialName, String newName) {
         //Устанавливаем изначальное имя
-        updateProfileSteps.updateUserName(user1Token, initialName);
+        UpdateProfileSteps.updateUserName(user1Token, initialName);
 
         // Меняем имя на новое
         UpdateCustomerProfileRequest updateRequest = UpdateCustomerProfileRequest.builder()
@@ -108,10 +106,10 @@ public class UpdateUserNameTest {
     @DisplayName("Пользователь может изменить имя на имя другого пользователя")
     public void userCanUpdateNameToNameAnotherUserTest() {
         //Устанавливаем имя первому пользователю
-        updateProfileSteps.updateUserName(user1Token, NEW_NAME);
+        UpdateProfileSteps.updateUserName(user1Token, NEW_NAME);
 
         // Создаем второго пользователя и даем ему такое же имя
-        String user2Token = userGetTokenSteps.createRandomUserAndGetToken();
+        String user2Token = UserGetTokenSteps.createRandomUserAndGetToken();
 
         UpdateCustomerProfileRequest updateRequest = UpdateCustomerProfileRequest.builder()
                 .name(NEW_NAME)
@@ -128,7 +126,6 @@ public class UpdateUserNameTest {
         //Проверяем что у имени теперь новое значение
         assertEquals(NEW_NAME, actualName);
     }
-
 
     @ParameterizedTest
     @MethodSource("nameDataForCornerCases")

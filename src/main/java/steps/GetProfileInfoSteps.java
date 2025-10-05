@@ -7,7 +7,7 @@ import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class GetProfileInfoSteps {
-    public GetCustomerProfileResponse getProfileInfo(String userToken){
+    public static GetCustomerProfileResponse getProfileInfo(String userToken){
         return new CrudRequester(
                 RequestSpecs.userAuthSpec(userToken),
                 Endpoint.GET_CUSTOMER_INFO,

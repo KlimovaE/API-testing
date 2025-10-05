@@ -9,7 +9,7 @@ import spec.ResponseSpecs;
 
 public class UpdateProfileSteps {
 
-    public UpdateCustomerProfileResponse updateUserName(String userToken, String newName) {
+    public static UpdateCustomerProfileResponse updateUserName(String userToken, String newName) {
         UpdateCustomerProfileRequest updateRequest = UpdateCustomerProfileRequest.builder()
                 .name(newName)
                 .build();
