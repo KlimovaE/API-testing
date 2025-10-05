@@ -7,8 +7,10 @@ public class RandomData {
     private RandomData(){};
 
     public static String getUserName() {
-        return RandomStringUtils.randomAlphabetic(10);
+        String firstWord = RandomStringUtils.randomAlphabetic(3, 8);  // первое слово 3-8 букв
+        String secondWord = RandomStringUtils.randomAlphabetic(3, 8); // второе слово 3-8 букв
 
+        return firstWord + " " + secondWord;
     }
 
     public static String getPassword() {
