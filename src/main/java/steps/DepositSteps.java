@@ -8,7 +8,7 @@ import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class DepositSteps {
-    public DepositAccountResponse depositAccount(long accountId, double depositAmount, String userToken) {
+    public static DepositAccountResponse depositAccount(long accountId, double depositAmount, String userToken) {
         DepositAccountRequest depositUserAccount = DepositAccountRequest.builder()
                 .id(accountId)
                 .balance(depositAmount)

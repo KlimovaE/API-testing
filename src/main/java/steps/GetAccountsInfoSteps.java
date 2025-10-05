@@ -7,7 +7,7 @@ import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class GetAccountsInfoSteps {
-    public Account[]  getAccountsInfo(String userToken) {
+    public static Account[]  getAccountsInfo(String userToken) {
         return new CrudRequester(
                 RequestSpecs.userAuthSpec(userToken),
                 Endpoint.ACCOUNTS_INFO,

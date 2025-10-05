@@ -9,7 +9,7 @@ import spec.RequestSpecs;
 import spec.ResponseSpecs;
 
 public class UserCreationSteps {
-    public CreateUserRequest createUser(String username, String password, Role role) {
+    public static CreateUserRequest createUser(String username, String password, Role role) {
         CreateUserRequest createUserRequest =
                 RandomModelGenerator.generate(CreateUserRequest.class);
 
