@@ -44,8 +44,8 @@ public class TransferToAccountTest extends BaseUiTest {
     }
 
     @Test
-    @DisplayName("Успешное пополнение счета")
-    public void userCanDepositAccountTest() {
+    @DisplayName("Успешный перевод")
+    public void userCanTransferToAccountTest() {
         new TransferPage().open().transferToAccount(senderAccountName, recipientName, recipientAccountName, AMOUNT)
                 .checkAlertMessageAndAccept(successfulTransfer(recipientAccountName, AMOUNT));
 
@@ -59,8 +59,8 @@ public class TransferToAccountTest extends BaseUiTest {
     }
 
     @Test
-    @DisplayName("Ошибка: Неуспешное пополнение счета")
-    public void userCanNotDepositAccountTest() {
+    @DisplayName("Ошибка: Неуспешный перевод")
+    public void userCanNotTransferToAccountTest() {
         new TransferPage().open().transferToAccount(senderAccountName, recipientName, recipientAccountName, INVALID_TRANSIT_AMOUNT)
                 .checkAlertMessageAndAccept(BankAlert.UNSUCCESSFULLY_TRANSFER.getMessage());
 
