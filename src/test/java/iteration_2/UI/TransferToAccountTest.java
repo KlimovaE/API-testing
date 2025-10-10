@@ -28,19 +28,6 @@ public class TransferToAccountTest extends BaseUiTest {
     @BeforeEach
     @UserSession(value = 2, auth = 1) // Создаем 2 пользователей, авторизуем как первый
     public void setupUsersAndAccounts() {
-        System.out.println("=== DEBUG: setupUsersAndAccounts started ===");
-
-        // Проверяем, что пользователи созданы
-        try {
-            CreateUserRequest senderUser = common.storage.SessionStorage.getUser(1);
-            CreateUserRequest recipientUser = common.storage.SessionStorage.getUser(2);
-            System.out.println("DEBUG: Users found - Sender: " + senderUser.getUsername() +
-                    ", Recipient: " + recipientUser.getUsername());
-        } catch (Exception e) {
-            System.out.println("DEBUG: Error getting users: " + e.getMessage());
-            throw e;
-        }
-
         // Получаем пользователей из SessionStorage
         CreateUserRequest senderUser = common.storage.SessionStorage.getUser(1);
         senderToken = UserAuthSteps.loginUser(senderUser.getUsername(), senderUser.getPassword());
@@ -59,9 +46,8 @@ public class TransferToAccountTest extends BaseUiTest {
         recipientAccountId = recipientAccount.getId();
     }
 
-
-
     @Test
+    @UserSession(value = 2, auth = 1)
     @DisplayName("Успешный перевод")
     public void userCanTransferToAccountTest() {
         new TransferPage().open().transferToAccount(senderAccountName, recipientName, recipientAccountName, AMOUNT)
@@ -77,6 +63,7 @@ public class TransferToAccountTest extends BaseUiTest {
     }
 
     @Test
+    @UserSession(value = 2, auth = 1)
     @DisplayName("Ошибка: Неуспешный перевод")
     public void userCanNotTransferToAccountTest() {
         new TransferPage().open().transferToAccount(senderAccountName, recipientName, recipientAccountName, INVALID_TRANSIT_AMOUNT)
