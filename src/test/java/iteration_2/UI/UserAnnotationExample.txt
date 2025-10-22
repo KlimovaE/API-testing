@@ -1,0 +1,45 @@
+// 1. ✅ Пользователь БЕЗ счета
+@Test
+@UserSession(createAccount = false)
+public void userWithoutAccount() {
+    // Только пользователь, счета нет
+}
+
+// 2. ✅ Пользователь СО счетом БЕЗ пополнения (баланс 0.00)
+@Test
+@UserSession // createAccount = true по умолчанию
+public void userWithEmptyAccount() {
+    // Пользователь + счет с balance = 0.00
+}
+
+// 3. ✅ Пользователь СО счетом С пополнением
+@Test
+@UserSession(balances = {1000.00})
+public void userWithFundedAccount() {
+    // Пользователь + счет с balance = 1000.00
+}
+
+// 4. ✅ Несколько пользователей с разными настройками
+@Test
+@UserSession(value = 2, balances = {500.00, 0.00}, createAccount = true)
+public void multipleUsersMixed() {
+    // User1: счет с 500.00
+    // User2: счет с 0.00
+}
+
+// 5. ✅ Несколько пользователей БЕЗ счетов
+@Test
+@UserSession(value = 3, createAccount = false)
+public void multipleUsersWithoutAccounts() {
+    // 3 пользователя, у всех нет счетов
+}
+Что происходит в коде:
+java
+if (createAccount) {
+    // Создаем счет
+    CreateAccountResponse account = AccountCreationSteps.createAccount(token);
+    SessionStorage.addUser(user, token, account); // перегрузка со счетом
+} else {
+    // Счет НЕ создается
+    SessionStorage.addUser(user, token); // перегрузка без счета
+}
